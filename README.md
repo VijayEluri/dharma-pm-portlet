@@ -27,9 +27,9 @@ This version has been modified from the most recent war file David posted on lif
 
 The properties and their defaults are:
 
-dharma.pm.fromaddress="admin@example.com"
-dharma.pm.fromname="Portal Administrator"
-dharma.pm.mailsubject="New personal message available on portal."
+    dharma.pm.fromaddress="admin@example.com"
+    dharma.pm.fromname="Portal Administrator"
+    dharma.pm.mailsubject="New personal message available on portal."
 
 ## Building
 
