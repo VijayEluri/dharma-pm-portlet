@@ -30,7 +30,7 @@ import com.dharma.model.PMMessage;
  * @author Brian Wing Shun Chan
  *
  */
-public class PMMessageImpl extends PMMessageModelImpl implements PMMessage {
+public class PMMessageImpl extends PMMessageBaseImpl {
 	public PMMessageImpl() {
 	}
 }

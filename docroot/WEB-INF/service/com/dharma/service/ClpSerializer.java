@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -19,24 +19,85 @@ import com.dharma.model.PMDeletedMessageClp;
 import com.dharma.model.PMMessageClp;
 import com.dharma.model.PMReadMessageClp;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
+import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayOutputStream;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ClassLoaderObjectInputStream;
+import com.liferay.portal.kernel.util.PropsUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.BaseModel;
+
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import java.lang.reflect.Method;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
  */
 public class ClpSerializer {
-	public static final String SERVLET_CONTEXT_NAME = "dharma-pm-portlet";
+	public static String getServletContextName() {
+		if (Validator.isNotNull(_servletContextName)) {
+			return _servletContextName;
+		}
 
-	public static void setClassLoader(ClassLoader classLoader) {
-		_classLoader = classLoader;
+		synchronized (ClpSerializer.class) {
+			if (Validator.isNotNull(_servletContextName)) {
+				return _servletContextName;
+			}
+
+			try {
+				ClassLoader classLoader = ClpSerializer.class.getClassLoader();
+
+				Class<?> portletPropsClass = classLoader.loadClass(
+						"com.liferay.util.portlet.PortletProps");
+
+				Method getMethod = portletPropsClass.getMethod("get",
+						new Class<?>[] { String.class });
+
+				String portletPropsServletContextName = (String)getMethod.invoke(null,
+						"dharma-pm-portlet-deployment-context");
+
+				if (Validator.isNotNull(portletPropsServletContextName)) {
+					_servletContextName = portletPropsServletContextName;
+				}
+			}
+			catch (Throwable t) {
+				if (_log.isInfoEnabled()) {
+					_log.info(
+						"Unable to locate deployment context from portlet properties");
+				}
+			}
+
+			if (Validator.isNull(_servletContextName)) {
+				try {
+					String propsUtilServletContextName = PropsUtil.get(
+							"dharma-pm-portlet-deployment-context");
+
+					if (Validator.isNotNull(propsUtilServletContextName)) {
+						_servletContextName = propsUtilServletContextName;
+					}
+				}
+				catch (Throwable t) {
+					if (_log.isInfoEnabled()) {
+						_log.info(
+							"Unable to locate deployment context from portal properties");
+					}
+				}
+			}
+
+			if (Validator.isNull(_servletContextName)) {
+				_servletContextName = "dharma-pm-portlet";
+			}
+
+			return _servletContextName;
+		}
 	}
 
 	public static Object translateInput(BaseModel<?> oldModel) {
@@ -44,241 +105,20 @@ public class ClpSerializer {
 
 		String oldModelClassName = oldModelClass.getName();
 
-		if (oldModelClassName.equals(PMMessageClp.class.getName())) {
-			PMMessageClp oldCplModel = (PMMessageClp)oldModel;
-
-			ClassLoader contextClassLoader = Thread.currentThread()
-												   .getContextClassLoader();
-
-			try {
-				Thread.currentThread().setContextClassLoader(_classLoader);
-
-				try {
-					Class<?> newModelClass = Class.forName("com.dharma.model.impl.PMMessageImpl",
-							true, _classLoader);
-
-					Object newModel = newModelClass.newInstance();
-
-					Method method0 = newModelClass.getMethod("setMessageId",
-							new Class[] { Long.TYPE });
-
-					Long value0 = new Long(oldCplModel.getMessageId());
-
-					method0.invoke(newModel, value0);
-
-					Method method1 = newModelClass.getMethod("setSubject",
-							new Class[] { String.class });
-
-					String value1 = oldCplModel.getSubject();
-
-					method1.invoke(newModel, value1);
-
-					Method method2 = newModelClass.getMethod("setBody",
-							new Class[] { String.class });
-
-					String value2 = oldCplModel.getBody();
-
-					method2.invoke(newModel, value2);
-
-					Method method3 = newModelClass.getMethod("setParentMessageId",
-							new Class[] { Long.TYPE });
-
-					Long value3 = new Long(oldCplModel.getParentMessageId());
-
-					method3.invoke(newModel, value3);
-
-					Method method4 = newModelClass.getMethod("setOwnerId",
-							new Class[] { Long.TYPE });
-
-					Long value4 = new Long(oldCplModel.getOwnerId());
-
-					method4.invoke(newModel, value4);
-
-					Method method5 = newModelClass.getMethod("setOwnerName",
-							new Class[] { String.class });
-
-					String value5 = oldCplModel.getOwnerName();
-
-					method5.invoke(newModel, value5);
-
-					Method method6 = newModelClass.getMethod("setPostedDate",
-							new Class[] { Date.class });
-
-					Date value6 = oldCplModel.getPostedDate();
-
-					method6.invoke(newModel, value6);
-
-					Method method7 = newModelClass.getMethod("setRecepients",
-							new Class[] { String.class });
-
-					String value7 = oldCplModel.getRecepients();
-
-					method7.invoke(newModel, value7);
-
-					return newModel;
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-				}
-			}
-			finally {
-				Thread.currentThread().setContextClassLoader(contextClassLoader);
-			}
+		if (oldModelClassName.equals(PMBlockedUserClp.class.getName())) {
+			return translateInputPMBlockedUser(oldModel);
 		}
 
 		if (oldModelClassName.equals(PMDeletedMessageClp.class.getName())) {
-			PMDeletedMessageClp oldCplModel = (PMDeletedMessageClp)oldModel;
+			return translateInputPMDeletedMessage(oldModel);
+		}
 
-			ClassLoader contextClassLoader = Thread.currentThread()
-												   .getContextClassLoader();
-
-			try {
-				Thread.currentThread().setContextClassLoader(_classLoader);
-
-				try {
-					Class<?> newModelClass = Class.forName("com.dharma.model.impl.PMDeletedMessageImpl",
-							true, _classLoader);
-
-					Object newModel = newModelClass.newInstance();
-
-					Method method0 = newModelClass.getMethod("setDeletedMessageId",
-							new Class[] { Long.TYPE });
-
-					Long value0 = new Long(oldCplModel.getDeletedMessageId());
-
-					method0.invoke(newModel, value0);
-
-					Method method1 = newModelClass.getMethod("setMessageId",
-							new Class[] { Long.TYPE });
-
-					Long value1 = new Long(oldCplModel.getMessageId());
-
-					method1.invoke(newModel, value1);
-
-					Method method2 = newModelClass.getMethod("setOwnerId",
-							new Class[] { Long.TYPE });
-
-					Long value2 = new Long(oldCplModel.getOwnerId());
-
-					method2.invoke(newModel, value2);
-
-					Method method3 = newModelClass.getMethod("setDeletedDate",
-							new Class[] { Date.class });
-
-					Date value3 = oldCplModel.getDeletedDate();
-
-					method3.invoke(newModel, value3);
-
-					return newModel;
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-				}
-			}
-			finally {
-				Thread.currentThread().setContextClassLoader(contextClassLoader);
-			}
+		if (oldModelClassName.equals(PMMessageClp.class.getName())) {
+			return translateInputPMMessage(oldModel);
 		}
 
 		if (oldModelClassName.equals(PMReadMessageClp.class.getName())) {
-			PMReadMessageClp oldCplModel = (PMReadMessageClp)oldModel;
-
-			ClassLoader contextClassLoader = Thread.currentThread()
-												   .getContextClassLoader();
-
-			try {
-				Thread.currentThread().setContextClassLoader(_classLoader);
-
-				try {
-					Class<?> newModelClass = Class.forName("com.dharma.model.impl.PMReadMessageImpl",
-							true, _classLoader);
-
-					Object newModel = newModelClass.newInstance();
-
-					Method method0 = newModelClass.getMethod("setReadMessageId",
-							new Class[] { Long.TYPE });
-
-					Long value0 = new Long(oldCplModel.getReadMessageId());
-
-					method0.invoke(newModel, value0);
-
-					Method method1 = newModelClass.getMethod("setMessageId",
-							new Class[] { Long.TYPE });
-
-					Long value1 = new Long(oldCplModel.getMessageId());
-
-					method1.invoke(newModel, value1);
-
-					Method method2 = newModelClass.getMethod("setReadDate",
-							new Class[] { Date.class });
-
-					Date value2 = oldCplModel.getReadDate();
-
-					method2.invoke(newModel, value2);
-
-					return newModel;
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-				}
-			}
-			finally {
-				Thread.currentThread().setContextClassLoader(contextClassLoader);
-			}
-		}
-
-		if (oldModelClassName.equals(PMBlockedUserClp.class.getName())) {
-			PMBlockedUserClp oldCplModel = (PMBlockedUserClp)oldModel;
-
-			ClassLoader contextClassLoader = Thread.currentThread()
-												   .getContextClassLoader();
-
-			try {
-				Thread.currentThread().setContextClassLoader(_classLoader);
-
-				try {
-					Class<?> newModelClass = Class.forName("com.dharma.model.impl.PMBlockedUserImpl",
-							true, _classLoader);
-
-					Object newModel = newModelClass.newInstance();
-
-					Method method0 = newModelClass.getMethod("setBlockedUserId",
-							new Class[] { Long.TYPE });
-
-					Long value0 = new Long(oldCplModel.getBlockedUserId());
-
-					method0.invoke(newModel, value0);
-
-					Method method1 = newModelClass.getMethod("setOwnerId",
-							new Class[] { Long.TYPE });
-
-					Long value1 = new Long(oldCplModel.getOwnerId());
-
-					method1.invoke(newModel, value1);
-
-					Method method2 = newModelClass.getMethod("setUserId",
-							new Class[] { Long.TYPE });
-
-					Long value2 = new Long(oldCplModel.getUserId());
-
-					method2.invoke(newModel, value2);
-
-					Method method3 = newModelClass.getMethod("setBlockedDate",
-							new Class[] { Date.class });
-
-					Date value3 = oldCplModel.getBlockedDate();
-
-					method3.invoke(newModel, value3);
-
-					return newModel;
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-				}
-			}
-			finally {
-				Thread.currentThread().setContextClassLoader(contextClassLoader);
-			}
+			return translateInputPMReadMessage(oldModel);
 		}
 
 		return oldModel;
@@ -294,6 +134,46 @@ public class ClpSerializer {
 		}
 
 		return newList;
+	}
+
+	public static Object translateInputPMBlockedUser(BaseModel<?> oldModel) {
+		PMBlockedUserClp oldClpModel = (PMBlockedUserClp)oldModel;
+
+		BaseModel<?> newModel = oldClpModel.getPMBlockedUserRemoteModel();
+
+		newModel.setModelAttributes(oldClpModel.getModelAttributes());
+
+		return newModel;
+	}
+
+	public static Object translateInputPMDeletedMessage(BaseModel<?> oldModel) {
+		PMDeletedMessageClp oldClpModel = (PMDeletedMessageClp)oldModel;
+
+		BaseModel<?> newModel = oldClpModel.getPMDeletedMessageRemoteModel();
+
+		newModel.setModelAttributes(oldClpModel.getModelAttributes());
+
+		return newModel;
+	}
+
+	public static Object translateInputPMMessage(BaseModel<?> oldModel) {
+		PMMessageClp oldClpModel = (PMMessageClp)oldModel;
+
+		BaseModel<?> newModel = oldClpModel.getPMMessageRemoteModel();
+
+		newModel.setModelAttributes(oldClpModel.getModelAttributes());
+
+		return newModel;
+	}
+
+	public static Object translateInputPMReadMessage(BaseModel<?> oldModel) {
+		PMReadMessageClp oldClpModel = (PMReadMessageClp)oldModel;
+
+		BaseModel<?> newModel = oldClpModel.getPMReadMessageRemoteModel();
+
+		newModel.setModelAttributes(oldClpModel.getModelAttributes());
+
+		return newModel;
 	}
 
 	public static Object translateInput(Object obj) {
@@ -313,209 +193,21 @@ public class ClpSerializer {
 
 		String oldModelClassName = oldModelClass.getName();
 
-		if (oldModelClassName.equals("com.dharma.model.impl.PMMessageImpl")) {
-			ClassLoader contextClassLoader = Thread.currentThread()
-												   .getContextClassLoader();
-
-			try {
-				Thread.currentThread().setContextClassLoader(_classLoader);
-
-				try {
-					PMMessageClp newModel = new PMMessageClp();
-
-					Method method0 = oldModelClass.getMethod("getMessageId");
-
-					Long value0 = (Long)method0.invoke(oldModel, (Object[])null);
-
-					newModel.setMessageId(value0);
-
-					Method method1 = oldModelClass.getMethod("getSubject");
-
-					String value1 = (String)method1.invoke(oldModel,
-							(Object[])null);
-
-					newModel.setSubject(value1);
-
-					Method method2 = oldModelClass.getMethod("getBody");
-
-					String value2 = (String)method2.invoke(oldModel,
-							(Object[])null);
-
-					newModel.setBody(value2);
-
-					Method method3 = oldModelClass.getMethod(
-							"getParentMessageId");
-
-					Long value3 = (Long)method3.invoke(oldModel, (Object[])null);
-
-					newModel.setParentMessageId(value3);
-
-					Method method4 = oldModelClass.getMethod("getOwnerId");
-
-					Long value4 = (Long)method4.invoke(oldModel, (Object[])null);
-
-					newModel.setOwnerId(value4);
-
-					Method method5 = oldModelClass.getMethod("getOwnerName");
-
-					String value5 = (String)method5.invoke(oldModel,
-							(Object[])null);
-
-					newModel.setOwnerName(value5);
-
-					Method method6 = oldModelClass.getMethod("getPostedDate");
-
-					Date value6 = (Date)method6.invoke(oldModel, (Object[])null);
-
-					newModel.setPostedDate(value6);
-
-					Method method7 = oldModelClass.getMethod("getRecepients");
-
-					String value7 = (String)method7.invoke(oldModel,
-							(Object[])null);
-
-					newModel.setRecepients(value7);
-
-					return newModel;
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-				}
-			}
-			finally {
-				Thread.currentThread().setContextClassLoader(contextClassLoader);
-			}
+		if (oldModelClassName.equals("com.dharma.model.impl.PMBlockedUserImpl")) {
+			return translateOutputPMBlockedUser(oldModel);
 		}
 
 		if (oldModelClassName.equals(
 					"com.dharma.model.impl.PMDeletedMessageImpl")) {
-			ClassLoader contextClassLoader = Thread.currentThread()
-												   .getContextClassLoader();
+			return translateOutputPMDeletedMessage(oldModel);
+		}
 
-			try {
-				Thread.currentThread().setContextClassLoader(_classLoader);
-
-				try {
-					PMDeletedMessageClp newModel = new PMDeletedMessageClp();
-
-					Method method0 = oldModelClass.getMethod(
-							"getDeletedMessageId");
-
-					Long value0 = (Long)method0.invoke(oldModel, (Object[])null);
-
-					newModel.setDeletedMessageId(value0);
-
-					Method method1 = oldModelClass.getMethod("getMessageId");
-
-					Long value1 = (Long)method1.invoke(oldModel, (Object[])null);
-
-					newModel.setMessageId(value1);
-
-					Method method2 = oldModelClass.getMethod("getOwnerId");
-
-					Long value2 = (Long)method2.invoke(oldModel, (Object[])null);
-
-					newModel.setOwnerId(value2);
-
-					Method method3 = oldModelClass.getMethod("getDeletedDate");
-
-					Date value3 = (Date)method3.invoke(oldModel, (Object[])null);
-
-					newModel.setDeletedDate(value3);
-
-					return newModel;
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-				}
-			}
-			finally {
-				Thread.currentThread().setContextClassLoader(contextClassLoader);
-			}
+		if (oldModelClassName.equals("com.dharma.model.impl.PMMessageImpl")) {
+			return translateOutputPMMessage(oldModel);
 		}
 
 		if (oldModelClassName.equals("com.dharma.model.impl.PMReadMessageImpl")) {
-			ClassLoader contextClassLoader = Thread.currentThread()
-												   .getContextClassLoader();
-
-			try {
-				Thread.currentThread().setContextClassLoader(_classLoader);
-
-				try {
-					PMReadMessageClp newModel = new PMReadMessageClp();
-
-					Method method0 = oldModelClass.getMethod("getReadMessageId");
-
-					Long value0 = (Long)method0.invoke(oldModel, (Object[])null);
-
-					newModel.setReadMessageId(value0);
-
-					Method method1 = oldModelClass.getMethod("getMessageId");
-
-					Long value1 = (Long)method1.invoke(oldModel, (Object[])null);
-
-					newModel.setMessageId(value1);
-
-					Method method2 = oldModelClass.getMethod("getReadDate");
-
-					Date value2 = (Date)method2.invoke(oldModel, (Object[])null);
-
-					newModel.setReadDate(value2);
-
-					return newModel;
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-				}
-			}
-			finally {
-				Thread.currentThread().setContextClassLoader(contextClassLoader);
-			}
-		}
-
-		if (oldModelClassName.equals("com.dharma.model.impl.PMBlockedUserImpl")) {
-			ClassLoader contextClassLoader = Thread.currentThread()
-												   .getContextClassLoader();
-
-			try {
-				Thread.currentThread().setContextClassLoader(_classLoader);
-
-				try {
-					PMBlockedUserClp newModel = new PMBlockedUserClp();
-
-					Method method0 = oldModelClass.getMethod("getBlockedUserId");
-
-					Long value0 = (Long)method0.invoke(oldModel, (Object[])null);
-
-					newModel.setBlockedUserId(value0);
-
-					Method method1 = oldModelClass.getMethod("getOwnerId");
-
-					Long value1 = (Long)method1.invoke(oldModel, (Object[])null);
-
-					newModel.setOwnerId(value1);
-
-					Method method2 = oldModelClass.getMethod("getUserId");
-
-					Long value2 = (Long)method2.invoke(oldModel, (Object[])null);
-
-					newModel.setUserId(value2);
-
-					Method method3 = oldModelClass.getMethod("getBlockedDate");
-
-					Date value3 = (Date)method3.invoke(oldModel, (Object[])null);
-
-					newModel.setBlockedDate(value3);
-
-					return newModel;
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-				}
-			}
-			finally {
-				Thread.currentThread().setContextClassLoader(contextClassLoader);
-			}
+			return translateOutputPMReadMessage(oldModel);
 		}
 
 		return oldModel;
@@ -545,6 +237,119 @@ public class ClpSerializer {
 		}
 	}
 
+	public static Throwable translateThrowable(Throwable throwable) {
+		if (_useReflectionToTranslateThrowable) {
+			try {
+				UnsyncByteArrayOutputStream unsyncByteArrayOutputStream = new UnsyncByteArrayOutputStream();
+				ObjectOutputStream objectOutputStream = new ObjectOutputStream(unsyncByteArrayOutputStream);
+
+				objectOutputStream.writeObject(throwable);
+
+				objectOutputStream.flush();
+				objectOutputStream.close();
+
+				UnsyncByteArrayInputStream unsyncByteArrayInputStream = new UnsyncByteArrayInputStream(unsyncByteArrayOutputStream.unsafeGetByteArray(),
+						0, unsyncByteArrayOutputStream.size());
+
+				Thread currentThread = Thread.currentThread();
+
+				ClassLoader contextClassLoader = currentThread.getContextClassLoader();
+
+				ObjectInputStream objectInputStream = new ClassLoaderObjectInputStream(unsyncByteArrayInputStream,
+						contextClassLoader);
+
+				throwable = (Throwable)objectInputStream.readObject();
+
+				objectInputStream.close();
+
+				return throwable;
+			}
+			catch (SecurityException se) {
+				if (_log.isInfoEnabled()) {
+					_log.info("Do not use reflection to translate throwable");
+				}
+
+				_useReflectionToTranslateThrowable = false;
+			}
+			catch (Throwable throwable2) {
+				_log.error(throwable2, throwable2);
+
+				return throwable2;
+			}
+		}
+
+		Class<?> clazz = throwable.getClass();
+
+		String className = clazz.getName();
+
+		if (className.equals(PortalException.class.getName())) {
+			return new PortalException();
+		}
+
+		if (className.equals(SystemException.class.getName())) {
+			return new SystemException();
+		}
+
+		if (className.equals("com.dharma.NoSuchPMBlockedUserException")) {
+			return new com.dharma.NoSuchPMBlockedUserException();
+		}
+
+		if (className.equals("com.dharma.NoSuchPMDeletedMessageException")) {
+			return new com.dharma.NoSuchPMDeletedMessageException();
+		}
+
+		if (className.equals("com.dharma.NoSuchPMMessageException")) {
+			return new com.dharma.NoSuchPMMessageException();
+		}
+
+		if (className.equals("com.dharma.NoSuchPMReadMessageException")) {
+			return new com.dharma.NoSuchPMReadMessageException();
+		}
+
+		return throwable;
+	}
+
+	public static Object translateOutputPMBlockedUser(BaseModel<?> oldModel) {
+		PMBlockedUserClp newModel = new PMBlockedUserClp();
+
+		newModel.setModelAttributes(oldModel.getModelAttributes());
+
+		newModel.setPMBlockedUserRemoteModel(oldModel);
+
+		return newModel;
+	}
+
+	public static Object translateOutputPMDeletedMessage(BaseModel<?> oldModel) {
+		PMDeletedMessageClp newModel = new PMDeletedMessageClp();
+
+		newModel.setModelAttributes(oldModel.getModelAttributes());
+
+		newModel.setPMDeletedMessageRemoteModel(oldModel);
+
+		return newModel;
+	}
+
+	public static Object translateOutputPMMessage(BaseModel<?> oldModel) {
+		PMMessageClp newModel = new PMMessageClp();
+
+		newModel.setModelAttributes(oldModel.getModelAttributes());
+
+		newModel.setPMMessageRemoteModel(oldModel);
+
+		return newModel;
+	}
+
+	public static Object translateOutputPMReadMessage(BaseModel<?> oldModel) {
+		PMReadMessageClp newModel = new PMReadMessageClp();
+
+		newModel.setModelAttributes(oldModel.getModelAttributes());
+
+		newModel.setPMReadMessageRemoteModel(oldModel);
+
+		return newModel;
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(ClpSerializer.class);
-	private static ClassLoader _classLoader;
+	private static String _servletContextName;
+	private static boolean _useReflectionToTranslateThrowable = true;
 }

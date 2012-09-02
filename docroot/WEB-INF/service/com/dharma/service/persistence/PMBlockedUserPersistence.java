@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,10 +22,6 @@ import com.liferay.portal.service.persistence.BasePersistence;
  * The persistence interface for the p m blocked user service.
  *
  * <p>
- * Never modify or reference this interface directly. Always use {@link PMBlockedUserUtil} to access the p m blocked user persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.
- * </p>
- *
- * <p>
  * Caching information and settings can be found in <code>portal.properties</code>
  * </p>
  *
@@ -35,17 +31,23 @@ import com.liferay.portal.service.persistence.BasePersistence;
  * @generated
  */
 public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser> {
+	/*
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link PMBlockedUserUtil} to access the p m blocked user persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.
+	 */
+
 	/**
 	* Caches the p m blocked user in the entity cache if it is enabled.
 	*
-	* @param pmBlockedUser the p m blocked user to cache
+	* @param pmBlockedUser the p m blocked user
 	*/
 	public void cacheResult(com.dharma.model.PMBlockedUser pmBlockedUser);
 
 	/**
 	* Caches the p m blocked users in the entity cache if it is enabled.
 	*
-	* @param pmBlockedUsers the p m blocked users to cache
+	* @param pmBlockedUsers the p m blocked users
 	*/
 	public void cacheResult(
 		java.util.List<com.dharma.model.PMBlockedUser> pmBlockedUsers);
@@ -61,7 +63,7 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 	/**
 	* Removes the p m blocked user with the primary key from the database. Also notifies the appropriate model listeners.
 	*
-	* @param blockedUserId the primary key of the p m blocked user to remove
+	* @param blockedUserId the primary key of the p m blocked user
 	* @return the p m blocked user that was removed
 	* @throws com.dharma.NoSuchPMBlockedUserException if a p m blocked user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -75,9 +77,9 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the p m blocked user with the primary key or throws a {@link com.dharma.NoSuchPMBlockedUserException} if it could not be found.
+	* Returns the p m blocked user with the primary key or throws a {@link com.dharma.NoSuchPMBlockedUserException} if it could not be found.
 	*
-	* @param blockedUserId the primary key of the p m blocked user to find
+	* @param blockedUserId the primary key of the p m blocked user
 	* @return the p m blocked user
 	* @throws com.dharma.NoSuchPMBlockedUserException if a p m blocked user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -87,9 +89,9 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the p m blocked user with the primary key or returns <code>null</code> if it could not be found.
+	* Returns the p m blocked user with the primary key or returns <code>null</code> if it could not be found.
 	*
-	* @param blockedUserId the primary key of the p m blocked user to find
+	* @param blockedUserId the primary key of the p m blocked user
 	* @return the p m blocked user, or <code>null</code> if a p m blocked user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
@@ -97,10 +99,10 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds all the p m blocked users where ownerId = &#63; and userId = &#63;.
+	* Returns all the p m blocked users where ownerId = &#63; and userId = &#63;.
 	*
-	* @param ownerId the owner id to search with
-	* @param userId the user id to search with
+	* @param ownerId the owner ID
+	* @param userId the user ID
 	* @return the matching p m blocked users
 	* @throws SystemException if a system exception occurred
 	*/
@@ -109,16 +111,16 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds a range of all the p m blocked users where ownerId = &#63; and userId = &#63;.
+	* Returns a range of all the p m blocked users where ownerId = &#63; and userId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param ownerId the owner id to search with
-	* @param userId the user id to search with
-	* @param start the lower bound of the range of p m blocked users to return
-	* @param end the upper bound of the range of p m blocked users to return (not inclusive)
+	* @param ownerId the owner ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of p m blocked users
+	* @param end the upper bound of the range of p m blocked users (not inclusive)
 	* @return the range of matching p m blocked users
 	* @throws SystemException if a system exception occurred
 	*/
@@ -127,17 +129,17 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds an ordered range of all the p m blocked users where ownerId = &#63; and userId = &#63;.
+	* Returns an ordered range of all the p m blocked users where ownerId = &#63; and userId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param ownerId the owner id to search with
-	* @param userId the user id to search with
-	* @param start the lower bound of the range of p m blocked users to return
-	* @param end the upper bound of the range of p m blocked users to return (not inclusive)
-	* @param orderByComparator the comparator to order the results by
+	* @param ownerId the owner ID
+	* @param userId the user ID
+	* @param start the lower bound of the range of p m blocked users
+	* @param end the upper bound of the range of p m blocked users (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching p m blocked users
 	* @throws SystemException if a system exception occurred
 	*/
@@ -147,15 +149,11 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the first p m blocked user in the ordered set where ownerId = &#63; and userId = &#63;.
+	* Returns the first p m blocked user in the ordered set where ownerId = &#63; and userId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
-	*
-	* @param ownerId the owner id to search with
-	* @param userId the user id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param ownerId the owner ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching p m blocked user
 	* @throws com.dharma.NoSuchPMBlockedUserException if a matching p m blocked user could not be found
 	* @throws SystemException if a system exception occurred
@@ -167,15 +165,25 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the last p m blocked user in the ordered set where ownerId = &#63; and userId = &#63;.
+	* Returns the first p m blocked user in the ordered set where ownerId = &#63; and userId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
+	* @param ownerId the owner ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching p m blocked user, or <code>null</code> if a matching p m blocked user could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.dharma.model.PMBlockedUser fetchByOwnerAndUser_First(
+		long ownerId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last p m blocked user in the ordered set where ownerId = &#63; and userId = &#63;.
 	*
-	* @param ownerId the owner id to search with
-	* @param userId the user id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param ownerId the owner ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching p m blocked user
 	* @throws com.dharma.NoSuchPMBlockedUserException if a matching p m blocked user could not be found
 	* @throws SystemException if a system exception occurred
@@ -187,16 +195,26 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the p m blocked users before and after the current p m blocked user in the ordered set where ownerId = &#63; and userId = &#63;.
+	* Returns the last p m blocked user in the ordered set where ownerId = &#63; and userId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
+	* @param ownerId the owner ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching p m blocked user, or <code>null</code> if a matching p m blocked user could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.dharma.model.PMBlockedUser fetchByOwnerAndUser_Last(
+		long ownerId, long userId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the p m blocked users before and after the current p m blocked user in the ordered set where ownerId = &#63; and userId = &#63;.
 	*
 	* @param blockedUserId the primary key of the current p m blocked user
-	* @param ownerId the owner id to search with
-	* @param userId the user id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param ownerId the owner ID
+	* @param userId the user ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next p m blocked user
 	* @throws com.dharma.NoSuchPMBlockedUserException if a p m blocked user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -208,9 +226,9 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds all the p m blocked users where ownerId = &#63;.
+	* Returns all the p m blocked users where ownerId = &#63;.
 	*
-	* @param ownerId the owner id to search with
+	* @param ownerId the owner ID
 	* @return the matching p m blocked users
 	* @throws SystemException if a system exception occurred
 	*/
@@ -219,15 +237,15 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds a range of all the p m blocked users where ownerId = &#63;.
+	* Returns a range of all the p m blocked users where ownerId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param ownerId the owner id to search with
-	* @param start the lower bound of the range of p m blocked users to return
-	* @param end the upper bound of the range of p m blocked users to return (not inclusive)
+	* @param ownerId the owner ID
+	* @param start the lower bound of the range of p m blocked users
+	* @param end the upper bound of the range of p m blocked users (not inclusive)
 	* @return the range of matching p m blocked users
 	* @throws SystemException if a system exception occurred
 	*/
@@ -236,16 +254,16 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds an ordered range of all the p m blocked users where ownerId = &#63;.
+	* Returns an ordered range of all the p m blocked users where ownerId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param ownerId the owner id to search with
-	* @param start the lower bound of the range of p m blocked users to return
-	* @param end the upper bound of the range of p m blocked users to return (not inclusive)
-	* @param orderByComparator the comparator to order the results by
+	* @param ownerId the owner ID
+	* @param start the lower bound of the range of p m blocked users
+	* @param end the upper bound of the range of p m blocked users (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching p m blocked users
 	* @throws SystemException if a system exception occurred
 	*/
@@ -255,14 +273,10 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the first p m blocked user in the ordered set where ownerId = &#63;.
+	* Returns the first p m blocked user in the ordered set where ownerId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
-	*
-	* @param ownerId the owner id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching p m blocked user
 	* @throws com.dharma.NoSuchPMBlockedUserException if a matching p m blocked user could not be found
 	* @throws SystemException if a system exception occurred
@@ -273,14 +287,22 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the last p m blocked user in the ordered set where ownerId = &#63;.
+	* Returns the first p m blocked user in the ordered set where ownerId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching p m blocked user, or <code>null</code> if a matching p m blocked user could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.dharma.model.PMBlockedUser fetchByOwner_First(long ownerId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last p m blocked user in the ordered set where ownerId = &#63;.
 	*
-	* @param ownerId the owner id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching p m blocked user
 	* @throws com.dharma.NoSuchPMBlockedUserException if a matching p m blocked user could not be found
 	* @throws SystemException if a system exception occurred
@@ -291,15 +313,23 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the p m blocked users before and after the current p m blocked user in the ordered set where ownerId = &#63;.
+	* Returns the last p m blocked user in the ordered set where ownerId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching p m blocked user, or <code>null</code> if a matching p m blocked user could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.dharma.model.PMBlockedUser fetchByOwner_Last(long ownerId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the p m blocked users before and after the current p m blocked user in the ordered set where ownerId = &#63;.
 	*
 	* @param blockedUserId the primary key of the current p m blocked user
-	* @param ownerId the owner id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next p m blocked user
 	* @throws com.dharma.NoSuchPMBlockedUserException if a p m blocked user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -311,7 +341,7 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds all the p m blocked users.
+	* Returns all the p m blocked users.
 	*
 	* @return the p m blocked users
 	* @throws SystemException if a system exception occurred
@@ -320,14 +350,14 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds a range of all the p m blocked users.
+	* Returns a range of all the p m blocked users.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param start the lower bound of the range of p m blocked users to return
-	* @param end the upper bound of the range of p m blocked users to return (not inclusive)
+	* @param start the lower bound of the range of p m blocked users
+	* @param end the upper bound of the range of p m blocked users (not inclusive)
 	* @return the range of p m blocked users
 	* @throws SystemException if a system exception occurred
 	*/
@@ -335,15 +365,15 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 		int end) throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds an ordered range of all the p m blocked users.
+	* Returns an ordered range of all the p m blocked users.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param start the lower bound of the range of p m blocked users to return
-	* @param end the upper bound of the range of p m blocked users to return (not inclusive)
-	* @param orderByComparator the comparator to order the results by
+	* @param start the lower bound of the range of p m blocked users
+	* @param end the upper bound of the range of p m blocked users (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of p m blocked users
 	* @throws SystemException if a system exception occurred
 	*/
@@ -355,8 +385,8 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 	/**
 	* Removes all the p m blocked users where ownerId = &#63; and userId = &#63; from the database.
 	*
-	* @param ownerId the owner id to search with
-	* @param userId the user id to search with
+	* @param ownerId the owner ID
+	* @param userId the user ID
 	* @throws SystemException if a system exception occurred
 	*/
 	public void removeByOwnerAndUser(long ownerId, long userId)
@@ -365,7 +395,7 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 	/**
 	* Removes all the p m blocked users where ownerId = &#63; from the database.
 	*
-	* @param ownerId the owner id to search with
+	* @param ownerId the owner ID
 	* @throws SystemException if a system exception occurred
 	*/
 	public void removeByOwner(long ownerId)
@@ -380,10 +410,10 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Counts all the p m blocked users where ownerId = &#63; and userId = &#63;.
+	* Returns the number of p m blocked users where ownerId = &#63; and userId = &#63;.
 	*
-	* @param ownerId the owner id to search with
-	* @param userId the user id to search with
+	* @param ownerId the owner ID
+	* @param userId the user ID
 	* @return the number of matching p m blocked users
 	* @throws SystemException if a system exception occurred
 	*/
@@ -391,9 +421,9 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Counts all the p m blocked users where ownerId = &#63;.
+	* Returns the number of p m blocked users where ownerId = &#63;.
 	*
-	* @param ownerId the owner id to search with
+	* @param ownerId the owner ID
 	* @return the number of matching p m blocked users
 	* @throws SystemException if a system exception occurred
 	*/
@@ -401,7 +431,7 @@ public interface PMBlockedUserPersistence extends BasePersistence<PMBlockedUser>
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Counts all the p m blocked users.
+	* Returns the number of p m blocked users.
 	*
 	* @return the number of p m blocked users
 	* @throws SystemException if a system exception occurred

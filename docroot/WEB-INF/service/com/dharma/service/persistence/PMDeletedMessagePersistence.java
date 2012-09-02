@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -22,10 +22,6 @@ import com.liferay.portal.service.persistence.BasePersistence;
  * The persistence interface for the p m deleted message service.
  *
  * <p>
- * Never modify or reference this interface directly. Always use {@link PMDeletedMessageUtil} to access the p m deleted message persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.
- * </p>
- *
- * <p>
  * Caching information and settings can be found in <code>portal.properties</code>
  * </p>
  *
@@ -35,17 +31,23 @@ import com.liferay.portal.service.persistence.BasePersistence;
  * @generated
  */
 public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMessage> {
+	/*
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this interface directly. Always use {@link PMDeletedMessageUtil} to access the p m deleted message persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this interface.
+	 */
+
 	/**
 	* Caches the p m deleted message in the entity cache if it is enabled.
 	*
-	* @param pmDeletedMessage the p m deleted message to cache
+	* @param pmDeletedMessage the p m deleted message
 	*/
 	public void cacheResult(com.dharma.model.PMDeletedMessage pmDeletedMessage);
 
 	/**
 	* Caches the p m deleted messages in the entity cache if it is enabled.
 	*
-	* @param pmDeletedMessages the p m deleted messages to cache
+	* @param pmDeletedMessages the p m deleted messages
 	*/
 	public void cacheResult(
 		java.util.List<com.dharma.model.PMDeletedMessage> pmDeletedMessages);
@@ -61,7 +63,7 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 	/**
 	* Removes the p m deleted message with the primary key from the database. Also notifies the appropriate model listeners.
 	*
-	* @param deletedMessageId the primary key of the p m deleted message to remove
+	* @param deletedMessageId the primary key of the p m deleted message
 	* @return the p m deleted message that was removed
 	* @throws com.dharma.NoSuchPMDeletedMessageException if a p m deleted message with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -75,9 +77,9 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the p m deleted message with the primary key or throws a {@link com.dharma.NoSuchPMDeletedMessageException} if it could not be found.
+	* Returns the p m deleted message with the primary key or throws a {@link com.dharma.NoSuchPMDeletedMessageException} if it could not be found.
 	*
-	* @param deletedMessageId the primary key of the p m deleted message to find
+	* @param deletedMessageId the primary key of the p m deleted message
 	* @return the p m deleted message
 	* @throws com.dharma.NoSuchPMDeletedMessageException if a p m deleted message with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -88,9 +90,9 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the p m deleted message with the primary key or returns <code>null</code> if it could not be found.
+	* Returns the p m deleted message with the primary key or returns <code>null</code> if it could not be found.
 	*
-	* @param deletedMessageId the primary key of the p m deleted message to find
+	* @param deletedMessageId the primary key of the p m deleted message
 	* @return the p m deleted message, or <code>null</code> if a p m deleted message with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
@@ -99,9 +101,9 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds all the p m deleted messages where ownerId = &#63;.
+	* Returns all the p m deleted messages where ownerId = &#63;.
 	*
-	* @param ownerId the owner id to search with
+	* @param ownerId the owner ID
 	* @return the matching p m deleted messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -110,15 +112,15 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds a range of all the p m deleted messages where ownerId = &#63;.
+	* Returns a range of all the p m deleted messages where ownerId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param ownerId the owner id to search with
-	* @param start the lower bound of the range of p m deleted messages to return
-	* @param end the upper bound of the range of p m deleted messages to return (not inclusive)
+	* @param ownerId the owner ID
+	* @param start the lower bound of the range of p m deleted messages
+	* @param end the upper bound of the range of p m deleted messages (not inclusive)
 	* @return the range of matching p m deleted messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -127,16 +129,16 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds an ordered range of all the p m deleted messages where ownerId = &#63;.
+	* Returns an ordered range of all the p m deleted messages where ownerId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param ownerId the owner id to search with
-	* @param start the lower bound of the range of p m deleted messages to return
-	* @param end the upper bound of the range of p m deleted messages to return (not inclusive)
-	* @param orderByComparator the comparator to order the results by
+	* @param ownerId the owner ID
+	* @param start the lower bound of the range of p m deleted messages
+	* @param end the upper bound of the range of p m deleted messages (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching p m deleted messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -146,14 +148,10 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the first p m deleted message in the ordered set where ownerId = &#63;.
+	* Returns the first p m deleted message in the ordered set where ownerId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
-	*
-	* @param ownerId the owner id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching p m deleted message
 	* @throws com.dharma.NoSuchPMDeletedMessageException if a matching p m deleted message could not be found
 	* @throws SystemException if a system exception occurred
@@ -164,14 +162,23 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the last p m deleted message in the ordered set where ownerId = &#63;.
+	* Returns the first p m deleted message in the ordered set where ownerId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching p m deleted message, or <code>null</code> if a matching p m deleted message could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.dharma.model.PMDeletedMessage fetchByOwnerId_First(
+		long ownerId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last p m deleted message in the ordered set where ownerId = &#63;.
 	*
-	* @param ownerId the owner id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching p m deleted message
 	* @throws com.dharma.NoSuchPMDeletedMessageException if a matching p m deleted message could not be found
 	* @throws SystemException if a system exception occurred
@@ -182,15 +189,23 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the p m deleted messages before and after the current p m deleted message in the ordered set where ownerId = &#63;.
+	* Returns the last p m deleted message in the ordered set where ownerId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching p m deleted message, or <code>null</code> if a matching p m deleted message could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.dharma.model.PMDeletedMessage fetchByOwnerId_Last(long ownerId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the p m deleted messages before and after the current p m deleted message in the ordered set where ownerId = &#63;.
 	*
 	* @param deletedMessageId the primary key of the current p m deleted message
-	* @param ownerId the owner id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next p m deleted message
 	* @throws com.dharma.NoSuchPMDeletedMessageException if a p m deleted message with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -202,9 +217,9 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds all the p m deleted messages where messageId = &#63;.
+	* Returns all the p m deleted messages where messageId = &#63;.
 	*
-	* @param messageId the message id to search with
+	* @param messageId the message ID
 	* @return the matching p m deleted messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -213,15 +228,15 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds a range of all the p m deleted messages where messageId = &#63;.
+	* Returns a range of all the p m deleted messages where messageId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param messageId the message id to search with
-	* @param start the lower bound of the range of p m deleted messages to return
-	* @param end the upper bound of the range of p m deleted messages to return (not inclusive)
+	* @param messageId the message ID
+	* @param start the lower bound of the range of p m deleted messages
+	* @param end the upper bound of the range of p m deleted messages (not inclusive)
 	* @return the range of matching p m deleted messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -230,16 +245,16 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds an ordered range of all the p m deleted messages where messageId = &#63;.
+	* Returns an ordered range of all the p m deleted messages where messageId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param messageId the message id to search with
-	* @param start the lower bound of the range of p m deleted messages to return
-	* @param end the upper bound of the range of p m deleted messages to return (not inclusive)
-	* @param orderByComparator the comparator to order the results by
+	* @param messageId the message ID
+	* @param start the lower bound of the range of p m deleted messages
+	* @param end the upper bound of the range of p m deleted messages (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching p m deleted messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -249,14 +264,10 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the first p m deleted message in the ordered set where messageId = &#63;.
+	* Returns the first p m deleted message in the ordered set where messageId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
-	*
-	* @param messageId the message id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param messageId the message ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching p m deleted message
 	* @throws com.dharma.NoSuchPMDeletedMessageException if a matching p m deleted message could not be found
 	* @throws SystemException if a system exception occurred
@@ -268,14 +279,23 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the last p m deleted message in the ordered set where messageId = &#63;.
+	* Returns the first p m deleted message in the ordered set where messageId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
+	* @param messageId the message ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching p m deleted message, or <code>null</code> if a matching p m deleted message could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.dharma.model.PMDeletedMessage fetchByMessageId_First(
+		long messageId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the last p m deleted message in the ordered set where messageId = &#63;.
 	*
-	* @param messageId the message id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param messageId the message ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching p m deleted message
 	* @throws com.dharma.NoSuchPMDeletedMessageException if a matching p m deleted message could not be found
 	* @throws SystemException if a system exception occurred
@@ -287,15 +307,24 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds the p m deleted messages before and after the current p m deleted message in the ordered set where messageId = &#63;.
+	* Returns the last p m deleted message in the ordered set where messageId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
+	* @param messageId the message ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching p m deleted message, or <code>null</code> if a matching p m deleted message could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public com.dharma.model.PMDeletedMessage fetchByMessageId_Last(
+		long messageId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Returns the p m deleted messages before and after the current p m deleted message in the ordered set where messageId = &#63;.
 	*
 	* @param deletedMessageId the primary key of the current p m deleted message
-	* @param messageId the message id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param messageId the message ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next p m deleted message
 	* @throws com.dharma.NoSuchPMDeletedMessageException if a p m deleted message with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -307,7 +336,7 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds all the p m deleted messages.
+	* Returns all the p m deleted messages.
 	*
 	* @return the p m deleted messages
 	* @throws SystemException if a system exception occurred
@@ -316,14 +345,14 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds a range of all the p m deleted messages.
+	* Returns a range of all the p m deleted messages.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param start the lower bound of the range of p m deleted messages to return
-	* @param end the upper bound of the range of p m deleted messages to return (not inclusive)
+	* @param start the lower bound of the range of p m deleted messages
+	* @param end the upper bound of the range of p m deleted messages (not inclusive)
 	* @return the range of p m deleted messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -332,15 +361,15 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Finds an ordered range of all the p m deleted messages.
+	* Returns an ordered range of all the p m deleted messages.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param start the lower bound of the range of p m deleted messages to return
-	* @param end the upper bound of the range of p m deleted messages to return (not inclusive)
-	* @param orderByComparator the comparator to order the results by
+	* @param start the lower bound of the range of p m deleted messages
+	* @param end the upper bound of the range of p m deleted messages (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of p m deleted messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -352,7 +381,7 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 	/**
 	* Removes all the p m deleted messages where ownerId = &#63; from the database.
 	*
-	* @param ownerId the owner id to search with
+	* @param ownerId the owner ID
 	* @throws SystemException if a system exception occurred
 	*/
 	public void removeByOwnerId(long ownerId)
@@ -361,7 +390,7 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 	/**
 	* Removes all the p m deleted messages where messageId = &#63; from the database.
 	*
-	* @param messageId the message id to search with
+	* @param messageId the message ID
 	* @throws SystemException if a system exception occurred
 	*/
 	public void removeByMessageId(long messageId)
@@ -376,9 +405,9 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Counts all the p m deleted messages where ownerId = &#63;.
+	* Returns the number of p m deleted messages where ownerId = &#63;.
 	*
-	* @param ownerId the owner id to search with
+	* @param ownerId the owner ID
 	* @return the number of matching p m deleted messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -386,9 +415,9 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Counts all the p m deleted messages where messageId = &#63;.
+	* Returns the number of p m deleted messages where messageId = &#63;.
 	*
-	* @param messageId the message id to search with
+	* @param messageId the message ID
 	* @return the number of matching p m deleted messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -396,7 +425,7 @@ public interface PMDeletedMessagePersistence extends BasePersistence<PMDeletedMe
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Counts all the p m deleted messages.
+	* Returns the number of p m deleted messages.
 	*
 	* @return the number of p m deleted messages
 	* @throws SystemException if a system exception occurred

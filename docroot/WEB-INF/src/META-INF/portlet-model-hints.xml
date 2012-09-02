@@ -1,6 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 
 <model-hints>
+	<model name="com.dharma.model.PMBlockedUser">
+		<field name="blockedUserId" type="long" />
+		<field name="ownerId" type="long" />
+		<field name="userId" type="long" />
+		<field name="blockedDate" type="Date" />
+	</model>
+	<model name="com.dharma.model.PMDeletedMessage">
+		<field name="deletedMessageId" type="long" />
+		<field name="messageId" type="long" />
+		<field name="ownerId" type="long" />
+		<field name="deletedDate" type="Date" />
+	</model>
 	<model name="com.dharma.model.PMMessage">
 		<field name="messageId" type="long" />
 		<field name="subject" type="String" />
@@ -13,21 +25,9 @@
 		<field name="postedDate" type="Date" />
 		<field name="recepients" type="String" />
 	</model>
-	<model name="com.dharma.model.PMDeletedMessage">
-		<field name="deletedMessageId" type="long" />
-		<field name="messageId" type="long" />
-		<field name="ownerId" type="long" />
-		<field name="deletedDate" type="Date" />
-	</model>
 	<model name="com.dharma.model.PMReadMessage">
 		<field name="readMessageId" type="long" />
 		<field name="messageId" type="long" />
 		<field name="readDate" type="Date" />
-	</model>
-	<model name="com.dharma.model.PMBlockedUser">
-		<field name="blockedUserId" type="long" />
-		<field name="ownerId" type="long" />
-		<field name="userId" type="long" />
-		<field name="blockedDate" type="Date" />
 	</model>
 </model-hints>

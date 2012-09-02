@@ -30,8 +30,7 @@ import com.dharma.model.PMDeletedMessage;
  * @author Brian Wing Shun Chan
  *
  */
-public class PMDeletedMessageImpl extends PMDeletedMessageModelImpl
-	implements PMDeletedMessage {
+public class PMDeletedMessageImpl extends PMDeletedMessageBaseImpl {
 	public PMDeletedMessageImpl() {
 	}
 }

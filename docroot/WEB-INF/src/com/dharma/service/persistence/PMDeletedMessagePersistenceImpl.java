@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,7 @@ import com.dharma.model.impl.PMDeletedMessageImpl;
 import com.dharma.model.impl.PMDeletedMessageModelImpl;
 
 import com.liferay.portal.NoSuchModelException;
-import com.liferay.portal.kernel.annotation.BeanReference;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -36,9 +36,12 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BatchSessionUtil;
 import com.liferay.portal.service.persistence.ResourcePersistence;
@@ -55,10 +58,6 @@ import java.util.List;
  * The persistence implementation for the p m deleted message service.
  *
  * <p>
- * Never modify or reference this class directly. Always use {@link PMDeletedMessageUtil} to access the p m deleted message persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
- * </p>
- *
- * <p>
  * Caching information and settings can be found in <code>portal.properties</code>
  * </p>
  *
@@ -69,65 +68,99 @@ import java.util.List;
  */
 public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDeletedMessage>
 	implements PMDeletedMessagePersistence {
+	/*
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. Always use {@link PMDeletedMessageUtil} to access the p m deleted message persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 */
 	public static final String FINDER_CLASS_NAME_ENTITY = PMDeletedMessageImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST = FINDER_CLASS_NAME_ENTITY +
-		".List";
-	public static final FinderPath FINDER_PATH_FIND_BY_OWNERID = new FinderPath(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_OWNERID = new FinderPath(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
 			PMDeletedMessageModelImpl.FINDER_CACHE_ENABLED,
-			FINDER_CLASS_NAME_LIST, "findByOwnerId",
+			PMDeletedMessageImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findByOwnerId",
 			new String[] {
 				Long.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OWNERID =
+		new FinderPath(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
+			PMDeletedMessageModelImpl.FINDER_CACHE_ENABLED,
+			PMDeletedMessageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByOwnerId",
+			new String[] { Long.class.getName() },
+			PMDeletedMessageModelImpl.OWNERID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_OWNERID = new FinderPath(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
-			PMDeletedMessageModelImpl.FINDER_CACHE_ENABLED,
-			FINDER_CLASS_NAME_LIST, "countByOwnerId",
+			PMDeletedMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByOwnerId",
 			new String[] { Long.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_BY_MESSAGEID = new FinderPath(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_MESSAGEID =
+		new FinderPath(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
 			PMDeletedMessageModelImpl.FINDER_CACHE_ENABLED,
-			FINDER_CLASS_NAME_LIST, "findByMessageId",
+			PMDeletedMessageImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findByMessageId",
 			new String[] {
 				Long.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_MESSAGEID =
+		new FinderPath(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
+			PMDeletedMessageModelImpl.FINDER_CACHE_ENABLED,
+			PMDeletedMessageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByMessageId",
+			new String[] { Long.class.getName() },
+			PMDeletedMessageModelImpl.MESSAGEID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_MESSAGEID = new FinderPath(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
-			PMDeletedMessageModelImpl.FINDER_CACHE_ENABLED,
-			FINDER_CLASS_NAME_LIST, "countByMessageId",
+			PMDeletedMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByMessageId",
 			new String[] { Long.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_ALL = new FinderPath(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
 			PMDeletedMessageModelImpl.FINDER_CACHE_ENABLED,
-			FINDER_CLASS_NAME_LIST, "findAll", new String[0]);
+			PMDeletedMessageImpl.class, FINDER_CLASS_NAME_LIST_WITH_PAGINATION,
+			"findAll", new String[0]);
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
+			PMDeletedMessageModelImpl.FINDER_CACHE_ENABLED,
+			PMDeletedMessageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
 	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
-			PMDeletedMessageModelImpl.FINDER_CACHE_ENABLED,
-			FINDER_CLASS_NAME_LIST, "countAll", new String[0]);
+			PMDeletedMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
 
 	/**
 	 * Caches the p m deleted message in the entity cache if it is enabled.
 	 *
-	 * @param pmDeletedMessage the p m deleted message to cache
+	 * @param pmDeletedMessage the p m deleted message
 	 */
 	public void cacheResult(PMDeletedMessage pmDeletedMessage) {
 		EntityCacheUtil.putResult(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
 			PMDeletedMessageImpl.class, pmDeletedMessage.getPrimaryKey(),
 			pmDeletedMessage);
+
+		pmDeletedMessage.resetOriginalValues();
 	}
 
 	/**
 	 * Caches the p m deleted messages in the entity cache if it is enabled.
 	 *
-	 * @param pmDeletedMessages the p m deleted messages to cache
+	 * @param pmDeletedMessages the p m deleted messages
 	 */
 	public void cacheResult(List<PMDeletedMessage> pmDeletedMessages) {
 		for (PMDeletedMessage pmDeletedMessage : pmDeletedMessages) {
 			if (EntityCacheUtil.getResult(
 						PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
 						PMDeletedMessageImpl.class,
-						pmDeletedMessage.getPrimaryKey(), this) == null) {
+						pmDeletedMessage.getPrimaryKey()) == null) {
 				cacheResult(pmDeletedMessage);
+			}
+			else {
+				pmDeletedMessage.resetOriginalValues();
 			}
 		}
 	}
@@ -139,11 +172,17 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
 	 * </p>
 	 */
+	@Override
 	public void clearCache() {
-		CacheRegistryUtil.clear(PMDeletedMessageImpl.class.getName());
+		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
+			CacheRegistryUtil.clear(PMDeletedMessageImpl.class.getName());
+		}
+
 		EntityCacheUtil.clearCache(PMDeletedMessageImpl.class.getName());
+
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	/**
@@ -153,9 +192,24 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
 	 * </p>
 	 */
+	@Override
 	public void clearCache(PMDeletedMessage pmDeletedMessage) {
 		EntityCacheUtil.removeResult(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
 			PMDeletedMessageImpl.class, pmDeletedMessage.getPrimaryKey());
+
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+	}
+
+	@Override
+	public void clearCache(List<PMDeletedMessage> pmDeletedMessages) {
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (PMDeletedMessage pmDeletedMessage : pmDeletedMessages) {
+			EntityCacheUtil.removeResult(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
+				PMDeletedMessageImpl.class, pmDeletedMessage.getPrimaryKey());
+		}
 	}
 
 	/**
@@ -176,25 +230,26 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	/**
 	 * Removes the p m deleted message with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
-	 * @param primaryKey the primary key of the p m deleted message to remove
-	 * @return the p m deleted message that was removed
-	 * @throws com.liferay.portal.NoSuchModelException if a p m deleted message with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	public PMDeletedMessage remove(Serializable primaryKey)
-		throws NoSuchModelException, SystemException {
-		return remove(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Removes the p m deleted message with the primary key from the database. Also notifies the appropriate model listeners.
-	 *
-	 * @param deletedMessageId the primary key of the p m deleted message to remove
+	 * @param deletedMessageId the primary key of the p m deleted message
 	 * @return the p m deleted message that was removed
 	 * @throws com.dharma.NoSuchPMDeletedMessageException if a p m deleted message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public PMDeletedMessage remove(long deletedMessageId)
+		throws NoSuchPMDeletedMessageException, SystemException {
+		return remove(Long.valueOf(deletedMessageId));
+	}
+
+	/**
+	 * Removes the p m deleted message with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param primaryKey the primary key of the p m deleted message
+	 * @return the p m deleted message that was removed
+	 * @throws com.dharma.NoSuchPMDeletedMessageException if a p m deleted message with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public PMDeletedMessage remove(Serializable primaryKey)
 		throws NoSuchPMDeletedMessageException, SystemException {
 		Session session = null;
 
@@ -202,16 +257,15 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 			session = openSession();
 
 			PMDeletedMessage pmDeletedMessage = (PMDeletedMessage)session.get(PMDeletedMessageImpl.class,
-					new Long(deletedMessageId));
+					primaryKey);
 
 			if (pmDeletedMessage == null) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-						deletedMessageId);
+					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchPMDeletedMessageException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					deletedMessageId);
+					primaryKey);
 			}
 
 			return remove(pmDeletedMessage);
@@ -227,6 +281,7 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 		}
 	}
 
+	@Override
 	protected PMDeletedMessage removeImpl(PMDeletedMessage pmDeletedMessage)
 		throws SystemException {
 		pmDeletedMessage = toUnwrappedModel(pmDeletedMessage);
@@ -236,19 +291,7 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 		try {
 			session = openSession();
 
-			if (pmDeletedMessage.isCachedModel() ||
-					BatchSessionUtil.isEnabled()) {
-				Object staleObject = session.get(PMDeletedMessageImpl.class,
-						pmDeletedMessage.getPrimaryKeyObj());
-
-				if (staleObject != null) {
-					session.evict(staleObject);
-				}
-			}
-
-			session.delete(pmDeletedMessage);
-
-			session.flush();
+			BatchSessionUtil.delete(session, pmDeletedMessage);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -257,18 +300,20 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
-
-		EntityCacheUtil.removeResult(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
-			PMDeletedMessageImpl.class, pmDeletedMessage.getPrimaryKey());
+		clearCache(pmDeletedMessage);
 
 		return pmDeletedMessage;
 	}
 
+	@Override
 	public PMDeletedMessage updateImpl(
 		com.dharma.model.PMDeletedMessage pmDeletedMessage, boolean merge)
 		throws SystemException {
 		pmDeletedMessage = toUnwrappedModel(pmDeletedMessage);
+
+		boolean isNew = pmDeletedMessage.isNew();
+
+		PMDeletedMessageModelImpl pmDeletedMessageModelImpl = (PMDeletedMessageModelImpl)pmDeletedMessage;
 
 		Session session = null;
 
@@ -286,7 +331,53 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+
+		if (isNew || !PMDeletedMessageModelImpl.COLUMN_BITMASK_ENABLED) {
+			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		}
+
+		else {
+			if ((pmDeletedMessageModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OWNERID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(pmDeletedMessageModelImpl.getOriginalOwnerId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_OWNERID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OWNERID,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(pmDeletedMessageModelImpl.getOwnerId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_OWNERID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OWNERID,
+					args);
+			}
+
+			if ((pmDeletedMessageModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_MESSAGEID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(pmDeletedMessageModelImpl.getOriginalMessageId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_MESSAGEID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_MESSAGEID,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(pmDeletedMessageModelImpl.getMessageId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_MESSAGEID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_MESSAGEID,
+					args);
+			}
+		}
 
 		EntityCacheUtil.putResult(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
 			PMDeletedMessageImpl.class, pmDeletedMessage.getPrimaryKey(),
@@ -315,22 +406,23 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Finds the p m deleted message with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the p m deleted message with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
 	 *
-	 * @param primaryKey the primary key of the p m deleted message to find
+	 * @param primaryKey the primary key of the p m deleted message
 	 * @return the p m deleted message
 	 * @throws com.liferay.portal.NoSuchModelException if a p m deleted message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public PMDeletedMessage findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchModelException, SystemException {
 		return findByPrimaryKey(((Long)primaryKey).longValue());
 	}
 
 	/**
-	 * Finds the p m deleted message with the primary key or throws a {@link com.dharma.NoSuchPMDeletedMessageException} if it could not be found.
+	 * Returns the p m deleted message with the primary key or throws a {@link com.dharma.NoSuchPMDeletedMessageException} if it could not be found.
 	 *
-	 * @param deletedMessageId the primary key of the p m deleted message to find
+	 * @param deletedMessageId the primary key of the p m deleted message
 	 * @return the p m deleted message
 	 * @throws com.dharma.NoSuchPMDeletedMessageException if a p m deleted message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
@@ -352,44 +444,58 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Finds the p m deleted message with the primary key or returns <code>null</code> if it could not be found.
+	 * Returns the p m deleted message with the primary key or returns <code>null</code> if it could not be found.
 	 *
-	 * @param primaryKey the primary key of the p m deleted message to find
+	 * @param primaryKey the primary key of the p m deleted message
 	 * @return the p m deleted message, or <code>null</code> if a p m deleted message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public PMDeletedMessage fetchByPrimaryKey(Serializable primaryKey)
 		throws SystemException {
 		return fetchByPrimaryKey(((Long)primaryKey).longValue());
 	}
 
 	/**
-	 * Finds the p m deleted message with the primary key or returns <code>null</code> if it could not be found.
+	 * Returns the p m deleted message with the primary key or returns <code>null</code> if it could not be found.
 	 *
-	 * @param deletedMessageId the primary key of the p m deleted message to find
+	 * @param deletedMessageId the primary key of the p m deleted message
 	 * @return the p m deleted message, or <code>null</code> if a p m deleted message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public PMDeletedMessage fetchByPrimaryKey(long deletedMessageId)
 		throws SystemException {
 		PMDeletedMessage pmDeletedMessage = (PMDeletedMessage)EntityCacheUtil.getResult(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
-				PMDeletedMessageImpl.class, deletedMessageId, this);
+				PMDeletedMessageImpl.class, deletedMessageId);
+
+		if (pmDeletedMessage == _nullPMDeletedMessage) {
+			return null;
+		}
 
 		if (pmDeletedMessage == null) {
 			Session session = null;
+
+			boolean hasException = false;
 
 			try {
 				session = openSession();
 
 				pmDeletedMessage = (PMDeletedMessage)session.get(PMDeletedMessageImpl.class,
-						new Long(deletedMessageId));
+						Long.valueOf(deletedMessageId));
 			}
 			catch (Exception e) {
+				hasException = true;
+
 				throw processException(e);
 			}
 			finally {
 				if (pmDeletedMessage != null) {
 					cacheResult(pmDeletedMessage);
+				}
+				else if (!hasException) {
+					EntityCacheUtil.putResult(PMDeletedMessageModelImpl.ENTITY_CACHE_ENABLED,
+						PMDeletedMessageImpl.class, deletedMessageId,
+						_nullPMDeletedMessage);
 				}
 
 				closeSession(session);
@@ -400,9 +506,9 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Finds all the p m deleted messages where ownerId = &#63;.
+	 * Returns all the p m deleted messages where ownerId = &#63;.
 	 *
-	 * @param ownerId the owner id to search with
+	 * @param ownerId the owner ID
 	 * @return the matching p m deleted messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -412,15 +518,15 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Finds a range of all the p m deleted messages where ownerId = &#63;.
+	 * Returns a range of all the p m deleted messages where ownerId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
-	 * @param ownerId the owner id to search with
-	 * @param start the lower bound of the range of p m deleted messages to return
-	 * @param end the upper bound of the range of p m deleted messages to return (not inclusive)
+	 * @param ownerId the owner ID
+	 * @param start the lower bound of the range of p m deleted messages
+	 * @param end the upper bound of the range of p m deleted messages (not inclusive)
 	 * @return the range of matching p m deleted messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -430,61 +536,77 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Finds an ordered range of all the p m deleted messages where ownerId = &#63;.
+	 * Returns an ordered range of all the p m deleted messages where ownerId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
-	 * @param ownerId the owner id to search with
-	 * @param start the lower bound of the range of p m deleted messages to return
-	 * @param end the upper bound of the range of p m deleted messages to return (not inclusive)
-	 * @param orderByComparator the comparator to order the results by
+	 * @param ownerId the owner ID
+	 * @param start the lower bound of the range of p m deleted messages
+	 * @param end the upper bound of the range of p m deleted messages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching p m deleted messages
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<PMDeletedMessage> findByOwnerId(long ownerId, int start,
 		int end, OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				ownerId,
-				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		List<PMDeletedMessage> list = (List<PMDeletedMessage>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_OWNERID,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OWNERID;
+			finderArgs = new Object[] { ownerId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_OWNERID;
+			finderArgs = new Object[] { ownerId, start, end, orderByComparator };
+		}
+
+		List<PMDeletedMessage> list = (List<PMDeletedMessage>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
 
+		if ((list != null) && !list.isEmpty()) {
+			for (PMDeletedMessage pmDeletedMessage : list) {
+				if ((ownerId != pmDeletedMessage.getOwnerId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
 		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(3);
+			}
+
+			query.append(_SQL_SELECT_PMDELETEDMESSAGE_WHERE);
+
+			query.append(_FINDER_COLUMN_OWNERID_OWNERID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+
+			else {
+				query.append(PMDeletedMessageModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
 			Session session = null;
 
 			try {
 				session = openSession();
-
-				StringBundler query = null;
-
-				if (orderByComparator != null) {
-					query = new StringBundler(3 +
-							(orderByComparator.getOrderByFields().length * 3));
-				}
-				else {
-					query = new StringBundler(3);
-				}
-
-				query.append(_SQL_SELECT_PMDELETEDMESSAGE_WHERE);
-
-				query.append(_FINDER_COLUMN_OWNERID_OWNERID_2);
-
-				if (orderByComparator != null) {
-					appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-						orderByComparator);
-				}
-
-				else {
-					query.append(PMDeletedMessageModelImpl.ORDER_BY_JPQL);
-				}
-
-				String sql = query.toString();
 
 				Query q = session.createQuery(sql);
 
@@ -500,13 +622,13 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 			}
 			finally {
 				if (list == null) {
-					list = new ArrayList<PMDeletedMessage>();
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
+				else {
+					cacheResult(list);
 
-				cacheResult(list);
-
-				FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_OWNERID,
-					finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 
 				closeSession(session);
 			}
@@ -516,14 +638,10 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Finds the first p m deleted message in the ordered set where ownerId = &#63;.
+	 * Returns the first p m deleted message in the ordered set where ownerId = &#63;.
 	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
-	 *
-	 * @param ownerId the owner id to search with
-	 * @param orderByComparator the comparator to order the set by
+	 * @param ownerId the owner ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching p m deleted message
 	 * @throws com.dharma.NoSuchPMDeletedMessageException if a matching p m deleted message could not be found
 	 * @throws SystemException if a system exception occurred
@@ -531,35 +649,50 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	public PMDeletedMessage findByOwnerId_First(long ownerId,
 		OrderByComparator orderByComparator)
 		throws NoSuchPMDeletedMessageException, SystemException {
-		List<PMDeletedMessage> list = findByOwnerId(ownerId, 0, 1,
+		PMDeletedMessage pmDeletedMessage = fetchByOwnerId_First(ownerId,
 				orderByComparator);
 
-		if (list.isEmpty()) {
-			StringBundler msg = new StringBundler(4);
-
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			msg.append("ownerId=");
-			msg.append(ownerId);
-
-			msg.append(StringPool.CLOSE_CURLY_BRACE);
-
-			throw new NoSuchPMDeletedMessageException(msg.toString());
+		if (pmDeletedMessage != null) {
+			return pmDeletedMessage;
 		}
-		else {
-			return list.get(0);
-		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("ownerId=");
+		msg.append(ownerId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchPMDeletedMessageException(msg.toString());
 	}
 
 	/**
-	 * Finds the last p m deleted message in the ordered set where ownerId = &#63;.
+	 * Returns the first p m deleted message in the ordered set where ownerId = &#63;.
 	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
+	 * @param ownerId the owner ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching p m deleted message, or <code>null</code> if a matching p m deleted message could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public PMDeletedMessage fetchByOwnerId_First(long ownerId,
+		OrderByComparator orderByComparator) throws SystemException {
+		List<PMDeletedMessage> list = findByOwnerId(ownerId, 0, 1,
+				orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last p m deleted message in the ordered set where ownerId = &#63;.
 	 *
-	 * @param ownerId the owner id to search with
-	 * @param orderByComparator the comparator to order the set by
+	 * @param ownerId the owner ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching p m deleted message
 	 * @throws com.dharma.NoSuchPMDeletedMessageException if a matching p m deleted message could not be found
 	 * @throws SystemException if a system exception occurred
@@ -567,38 +700,53 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	public PMDeletedMessage findByOwnerId_Last(long ownerId,
 		OrderByComparator orderByComparator)
 		throws NoSuchPMDeletedMessageException, SystemException {
+		PMDeletedMessage pmDeletedMessage = fetchByOwnerId_Last(ownerId,
+				orderByComparator);
+
+		if (pmDeletedMessage != null) {
+			return pmDeletedMessage;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("ownerId=");
+		msg.append(ownerId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchPMDeletedMessageException(msg.toString());
+	}
+
+	/**
+	 * Returns the last p m deleted message in the ordered set where ownerId = &#63;.
+	 *
+	 * @param ownerId the owner ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching p m deleted message, or <code>null</code> if a matching p m deleted message could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public PMDeletedMessage fetchByOwnerId_Last(long ownerId,
+		OrderByComparator orderByComparator) throws SystemException {
 		int count = countByOwnerId(ownerId);
 
 		List<PMDeletedMessage> list = findByOwnerId(ownerId, count - 1, count,
 				orderByComparator);
 
-		if (list.isEmpty()) {
-			StringBundler msg = new StringBundler(4);
-
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			msg.append("ownerId=");
-			msg.append(ownerId);
-
-			msg.append(StringPool.CLOSE_CURLY_BRACE);
-
-			throw new NoSuchPMDeletedMessageException(msg.toString());
-		}
-		else {
+		if (!list.isEmpty()) {
 			return list.get(0);
 		}
+
+		return null;
 	}
 
 	/**
-	 * Finds the p m deleted messages before and after the current p m deleted message in the ordered set where ownerId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
+	 * Returns the p m deleted messages before and after the current p m deleted message in the ordered set where ownerId = &#63;.
 	 *
 	 * @param deletedMessageId the primary key of the current p m deleted message
-	 * @param ownerId the owner id to search with
-	 * @param orderByComparator the comparator to order the set by
+	 * @param ownerId the owner ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next p m deleted message
 	 * @throws com.dharma.NoSuchPMDeletedMessageException if a p m deleted message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
@@ -651,17 +799,17 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 		query.append(_FINDER_COLUMN_OWNERID_OWNERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -680,6 +828,8 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -720,7 +870,7 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 		qPos.add(ownerId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(pmDeletedMessage);
+			Object[] values = orderByComparator.getOrderByConditionValues(pmDeletedMessage);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -738,9 +888,9 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Finds all the p m deleted messages where messageId = &#63;.
+	 * Returns all the p m deleted messages where messageId = &#63;.
 	 *
-	 * @param messageId the message id to search with
+	 * @param messageId the message ID
 	 * @return the matching p m deleted messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -751,15 +901,15 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Finds a range of all the p m deleted messages where messageId = &#63;.
+	 * Returns a range of all the p m deleted messages where messageId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
-	 * @param messageId the message id to search with
-	 * @param start the lower bound of the range of p m deleted messages to return
-	 * @param end the upper bound of the range of p m deleted messages to return (not inclusive)
+	 * @param messageId the message ID
+	 * @param start the lower bound of the range of p m deleted messages
+	 * @param end the upper bound of the range of p m deleted messages (not inclusive)
 	 * @return the range of matching p m deleted messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -769,61 +919,77 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Finds an ordered range of all the p m deleted messages where messageId = &#63;.
+	 * Returns an ordered range of all the p m deleted messages where messageId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
-	 * @param messageId the message id to search with
-	 * @param start the lower bound of the range of p m deleted messages to return
-	 * @param end the upper bound of the range of p m deleted messages to return (not inclusive)
-	 * @param orderByComparator the comparator to order the results by
+	 * @param messageId the message ID
+	 * @param start the lower bound of the range of p m deleted messages
+	 * @param end the upper bound of the range of p m deleted messages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching p m deleted messages
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<PMDeletedMessage> findByMessageId(long messageId, int start,
 		int end, OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				messageId,
-				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		List<PMDeletedMessage> list = (List<PMDeletedMessage>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_MESSAGEID,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_MESSAGEID;
+			finderArgs = new Object[] { messageId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_MESSAGEID;
+			finderArgs = new Object[] { messageId, start, end, orderByComparator };
+		}
+
+		List<PMDeletedMessage> list = (List<PMDeletedMessage>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
 
+		if ((list != null) && !list.isEmpty()) {
+			for (PMDeletedMessage pmDeletedMessage : list) {
+				if ((messageId != pmDeletedMessage.getMessageId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
 		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(3);
+			}
+
+			query.append(_SQL_SELECT_PMDELETEDMESSAGE_WHERE);
+
+			query.append(_FINDER_COLUMN_MESSAGEID_MESSAGEID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+
+			else {
+				query.append(PMDeletedMessageModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
 			Session session = null;
 
 			try {
 				session = openSession();
-
-				StringBundler query = null;
-
-				if (orderByComparator != null) {
-					query = new StringBundler(3 +
-							(orderByComparator.getOrderByFields().length * 3));
-				}
-				else {
-					query = new StringBundler(3);
-				}
-
-				query.append(_SQL_SELECT_PMDELETEDMESSAGE_WHERE);
-
-				query.append(_FINDER_COLUMN_MESSAGEID_MESSAGEID_2);
-
-				if (orderByComparator != null) {
-					appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-						orderByComparator);
-				}
-
-				else {
-					query.append(PMDeletedMessageModelImpl.ORDER_BY_JPQL);
-				}
-
-				String sql = query.toString();
 
 				Query q = session.createQuery(sql);
 
@@ -839,13 +1005,13 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 			}
 			finally {
 				if (list == null) {
-					list = new ArrayList<PMDeletedMessage>();
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
+				else {
+					cacheResult(list);
 
-				cacheResult(list);
-
-				FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_MESSAGEID,
-					finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 
 				closeSession(session);
 			}
@@ -855,14 +1021,10 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Finds the first p m deleted message in the ordered set where messageId = &#63;.
+	 * Returns the first p m deleted message in the ordered set where messageId = &#63;.
 	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
-	 *
-	 * @param messageId the message id to search with
-	 * @param orderByComparator the comparator to order the set by
+	 * @param messageId the message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching p m deleted message
 	 * @throws com.dharma.NoSuchPMDeletedMessageException if a matching p m deleted message could not be found
 	 * @throws SystemException if a system exception occurred
@@ -870,35 +1032,50 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	public PMDeletedMessage findByMessageId_First(long messageId,
 		OrderByComparator orderByComparator)
 		throws NoSuchPMDeletedMessageException, SystemException {
-		List<PMDeletedMessage> list = findByMessageId(messageId, 0, 1,
+		PMDeletedMessage pmDeletedMessage = fetchByMessageId_First(messageId,
 				orderByComparator);
 
-		if (list.isEmpty()) {
-			StringBundler msg = new StringBundler(4);
-
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			msg.append("messageId=");
-			msg.append(messageId);
-
-			msg.append(StringPool.CLOSE_CURLY_BRACE);
-
-			throw new NoSuchPMDeletedMessageException(msg.toString());
+		if (pmDeletedMessage != null) {
+			return pmDeletedMessage;
 		}
-		else {
-			return list.get(0);
-		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("messageId=");
+		msg.append(messageId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchPMDeletedMessageException(msg.toString());
 	}
 
 	/**
-	 * Finds the last p m deleted message in the ordered set where messageId = &#63;.
+	 * Returns the first p m deleted message in the ordered set where messageId = &#63;.
 	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
+	 * @param messageId the message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching p m deleted message, or <code>null</code> if a matching p m deleted message could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public PMDeletedMessage fetchByMessageId_First(long messageId,
+		OrderByComparator orderByComparator) throws SystemException {
+		List<PMDeletedMessage> list = findByMessageId(messageId, 0, 1,
+				orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last p m deleted message in the ordered set where messageId = &#63;.
 	 *
-	 * @param messageId the message id to search with
-	 * @param orderByComparator the comparator to order the set by
+	 * @param messageId the message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching p m deleted message
 	 * @throws com.dharma.NoSuchPMDeletedMessageException if a matching p m deleted message could not be found
 	 * @throws SystemException if a system exception occurred
@@ -906,38 +1083,53 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	public PMDeletedMessage findByMessageId_Last(long messageId,
 		OrderByComparator orderByComparator)
 		throws NoSuchPMDeletedMessageException, SystemException {
+		PMDeletedMessage pmDeletedMessage = fetchByMessageId_Last(messageId,
+				orderByComparator);
+
+		if (pmDeletedMessage != null) {
+			return pmDeletedMessage;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("messageId=");
+		msg.append(messageId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchPMDeletedMessageException(msg.toString());
+	}
+
+	/**
+	 * Returns the last p m deleted message in the ordered set where messageId = &#63;.
+	 *
+	 * @param messageId the message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching p m deleted message, or <code>null</code> if a matching p m deleted message could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public PMDeletedMessage fetchByMessageId_Last(long messageId,
+		OrderByComparator orderByComparator) throws SystemException {
 		int count = countByMessageId(messageId);
 
 		List<PMDeletedMessage> list = findByMessageId(messageId, count - 1,
 				count, orderByComparator);
 
-		if (list.isEmpty()) {
-			StringBundler msg = new StringBundler(4);
-
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			msg.append("messageId=");
-			msg.append(messageId);
-
-			msg.append(StringPool.CLOSE_CURLY_BRACE);
-
-			throw new NoSuchPMDeletedMessageException(msg.toString());
-		}
-		else {
+		if (!list.isEmpty()) {
 			return list.get(0);
 		}
+
+		return null;
 	}
 
 	/**
-	 * Finds the p m deleted messages before and after the current p m deleted message in the ordered set where messageId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
+	 * Returns the p m deleted messages before and after the current p m deleted message in the ordered set where messageId = &#63;.
 	 *
 	 * @param deletedMessageId the primary key of the current p m deleted message
-	 * @param messageId the message id to search with
-	 * @param orderByComparator the comparator to order the set by
+	 * @param messageId the message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next p m deleted message
 	 * @throws com.dharma.NoSuchPMDeletedMessageException if a p m deleted message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
@@ -991,17 +1183,17 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 		query.append(_FINDER_COLUMN_MESSAGEID_MESSAGEID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -1020,6 +1212,8 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -1060,7 +1254,7 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 		qPos.add(messageId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(pmDeletedMessage);
+			Object[] values = orderByComparator.getOrderByConditionValues(pmDeletedMessage);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -1078,7 +1272,7 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Finds all the p m deleted messages.
+	 * Returns all the p m deleted messages.
 	 *
 	 * @return the p m deleted messages
 	 * @throws SystemException if a system exception occurred
@@ -1088,14 +1282,14 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Finds a range of all the p m deleted messages.
+	 * Returns a range of all the p m deleted messages.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
-	 * @param start the lower bound of the range of p m deleted messages to return
-	 * @param end the upper bound of the range of p m deleted messages to return (not inclusive)
+	 * @param start the lower bound of the range of p m deleted messages
+	 * @param end the upper bound of the range of p m deleted messages (not inclusive)
 	 * @return the range of p m deleted messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -1105,51 +1299,59 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Finds an ordered range of all the p m deleted messages.
+	 * Returns an ordered range of all the p m deleted messages.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
-	 * @param start the lower bound of the range of p m deleted messages to return
-	 * @param end the upper bound of the range of p m deleted messages to return (not inclusive)
-	 * @param orderByComparator the comparator to order the results by
+	 * @param start the lower bound of the range of p m deleted messages
+	 * @param end the upper bound of the range of p m deleted messages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of p m deleted messages
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<PMDeletedMessage> findAll(int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = new Object[] { start, end, orderByComparator };
 
-		List<PMDeletedMessage> list = (List<PMDeletedMessage>)FinderCacheUtil.getResult(FINDER_PATH_FIND_ALL,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderArgs = FINDER_ARGS_EMPTY;
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
+			finderArgs = new Object[] { start, end, orderByComparator };
+		}
+
+		List<PMDeletedMessage> list = (List<PMDeletedMessage>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
 
 		if (list == null) {
+			StringBundler query = null;
+			String sql = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(2 +
+						(orderByComparator.getOrderByFields().length * 3));
+
+				query.append(_SQL_SELECT_PMDELETEDMESSAGE);
+
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+
+				sql = query.toString();
+			}
+			else {
+				sql = _SQL_SELECT_PMDELETEDMESSAGE.concat(PMDeletedMessageModelImpl.ORDER_BY_JPQL);
+			}
+
 			Session session = null;
 
 			try {
 				session = openSession();
-
-				StringBundler query = null;
-				String sql = null;
-
-				if (orderByComparator != null) {
-					query = new StringBundler(2 +
-							(orderByComparator.getOrderByFields().length * 3));
-
-					query.append(_SQL_SELECT_PMDELETEDMESSAGE);
-
-					appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-						orderByComparator);
-
-					sql = query.toString();
-				}
-				else {
-					sql = _SQL_SELECT_PMDELETEDMESSAGE.concat(PMDeletedMessageModelImpl.ORDER_BY_JPQL);
-				}
 
 				Query q = session.createQuery(sql);
 
@@ -1169,12 +1371,13 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 			}
 			finally {
 				if (list == null) {
-					list = new ArrayList<PMDeletedMessage>();
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
+				else {
+					cacheResult(list);
 
-				cacheResult(list);
-
-				FinderCacheUtil.putResult(FINDER_PATH_FIND_ALL, finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 
 				closeSession(session);
 			}
@@ -1186,7 +1389,7 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	/**
 	 * Removes all the p m deleted messages where ownerId = &#63; from the database.
 	 *
-	 * @param ownerId the owner id to search with
+	 * @param ownerId the owner ID
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void removeByOwnerId(long ownerId) throws SystemException {
@@ -1198,7 +1401,7 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	/**
 	 * Removes all the p m deleted messages where messageId = &#63; from the database.
 	 *
-	 * @param messageId the message id to search with
+	 * @param messageId the message ID
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void removeByMessageId(long messageId) throws SystemException {
@@ -1219,9 +1422,9 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Counts all the p m deleted messages where ownerId = &#63;.
+	 * Returns the number of p m deleted messages where ownerId = &#63;.
 	 *
-	 * @param ownerId the owner id to search with
+	 * @param ownerId the owner ID
 	 * @return the number of matching p m deleted messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -1232,18 +1435,18 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 				finderArgs, this);
 
 		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_PMDELETEDMESSAGE_WHERE);
+
+			query.append(_FINDER_COLUMN_OWNERID_OWNERID_2);
+
+			String sql = query.toString();
+
 			Session session = null;
 
 			try {
 				session = openSession();
-
-				StringBundler query = new StringBundler(2);
-
-				query.append(_SQL_COUNT_PMDELETEDMESSAGE_WHERE);
-
-				query.append(_FINDER_COLUMN_OWNERID_OWNERID_2);
-
-				String sql = query.toString();
 
 				Query q = session.createQuery(sql);
 
@@ -1272,9 +1475,9 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Counts all the p m deleted messages where messageId = &#63;.
+	 * Returns the number of p m deleted messages where messageId = &#63;.
 	 *
-	 * @param messageId the message id to search with
+	 * @param messageId the message ID
 	 * @return the number of matching p m deleted messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -1285,18 +1488,18 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 				finderArgs, this);
 
 		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_PMDELETEDMESSAGE_WHERE);
+
+			query.append(_FINDER_COLUMN_MESSAGEID_MESSAGEID_2);
+
+			String sql = query.toString();
+
 			Session session = null;
 
 			try {
 				session = openSession();
-
-				StringBundler query = new StringBundler(2);
-
-				query.append(_SQL_COUNT_PMDELETEDMESSAGE_WHERE);
-
-				query.append(_FINDER_COLUMN_MESSAGEID_MESSAGEID_2);
-
-				String sql = query.toString();
 
 				Query q = session.createQuery(sql);
 
@@ -1325,16 +1528,14 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	}
 
 	/**
-	 * Counts all the p m deleted messages.
+	 * Returns the number of p m deleted messages.
 	 *
 	 * @return the number of p m deleted messages
 	 * @throws SystemException if a system exception occurred
 	 */
 	public int countAll() throws SystemException {
-		Object[] finderArgs = new Object[0];
-
 		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
-				finderArgs, this);
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -1354,8 +1555,8 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 					count = Long.valueOf(0);
 				}
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL, finderArgs,
-					count);
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
+					FINDER_ARGS_EMPTY, count);
 
 				closeSession(session);
 			}
@@ -1389,14 +1590,20 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 		}
 	}
 
-	@BeanReference(type = PMMessagePersistence.class)
-	protected PMMessagePersistence pmMessagePersistence;
-	@BeanReference(type = PMDeletedMessagePersistence.class)
-	protected PMDeletedMessagePersistence pmDeletedMessagePersistence;
-	@BeanReference(type = PMReadMessagePersistence.class)
-	protected PMReadMessagePersistence pmReadMessagePersistence;
+	public void destroy() {
+		EntityCacheUtil.removeCache(PMDeletedMessageImpl.class.getName());
+		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_ENTITY);
+		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+	}
+
 	@BeanReference(type = PMBlockedUserPersistence.class)
 	protected PMBlockedUserPersistence pmBlockedUserPersistence;
+	@BeanReference(type = PMDeletedMessagePersistence.class)
+	protected PMDeletedMessagePersistence pmDeletedMessagePersistence;
+	@BeanReference(type = PMMessagePersistence.class)
+	protected PMMessagePersistence pmMessagePersistence;
+	@BeanReference(type = PMReadMessagePersistence.class)
+	protected PMReadMessagePersistence pmReadMessagePersistence;
 	@BeanReference(type = ResourcePersistence.class)
 	protected ResourcePersistence resourcePersistence;
 	@BeanReference(type = UserPersistence.class)
@@ -1410,5 +1617,24 @@ public class PMDeletedMessagePersistenceImpl extends BasePersistenceImpl<PMDelet
 	private static final String _ORDER_BY_ENTITY_ALIAS = "pmDeletedMessage.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No PMDeletedMessage exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No PMDeletedMessage exists with the key {";
+	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = GetterUtil.getBoolean(PropsUtil.get(
+				PropsKeys.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE));
 	private static Log _log = LogFactoryUtil.getLog(PMDeletedMessagePersistenceImpl.class);
+	private static PMDeletedMessage _nullPMDeletedMessage = new PMDeletedMessageImpl() {
+			@Override
+			public Object clone() {
+				return this;
+			}
+
+			@Override
+			public CacheModel<PMDeletedMessage> toCacheModel() {
+				return _nullPMDeletedMessageCacheModel;
+			}
+		};
+
+	private static CacheModel<PMDeletedMessage> _nullPMDeletedMessageCacheModel = new CacheModel<PMDeletedMessage>() {
+			public PMDeletedMessage toEntityModel() {
+				return _nullPMDeletedMessage;
+			}
+		};
 }

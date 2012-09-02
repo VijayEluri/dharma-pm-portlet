@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,7 +21,7 @@ import com.dharma.model.impl.PMMessageImpl;
 import com.dharma.model.impl.PMMessageModelImpl;
 
 import com.liferay.portal.NoSuchModelException;
-import com.liferay.portal.kernel.annotation.BeanReference;
+import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.cache.CacheRegistryUtil;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
@@ -36,9 +36,12 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.InstanceFactory;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.ModelListener;
 import com.liferay.portal.service.persistence.BatchSessionUtil;
 import com.liferay.portal.service.persistence.ResourcePersistence;
@@ -55,10 +58,6 @@ import java.util.List;
  * The persistence implementation for the p m message service.
  *
  * <p>
- * Never modify or reference this class directly. Always use {@link PMMessageUtil} to access the p m message persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
- * </p>
- *
- * <p>
  * Caching information and settings can be found in <code>portal.properties</code>
  * </p>
  *
@@ -69,61 +68,91 @@ import java.util.List;
  */
 public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	implements PMMessagePersistence {
+	/*
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify or reference this class directly. Always use {@link PMMessageUtil} to access the p m message persistence. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 */
 	public static final String FINDER_CLASS_NAME_ENTITY = PMMessageImpl.class.getName();
-	public static final String FINDER_CLASS_NAME_LIST = FINDER_CLASS_NAME_ENTITY +
-		".List";
-	public static final FinderPath FINDER_PATH_FIND_BY_OWNERID = new FinderPath(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
-			PMMessageModelImpl.FINDER_CACHE_ENABLED, FINDER_CLASS_NAME_LIST,
-			"findByOwnerId",
+	public static final String FINDER_CLASS_NAME_LIST_WITH_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List1";
+	public static final String FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION = FINDER_CLASS_NAME_ENTITY +
+		".List2";
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_OWNERID = new FinderPath(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
+			PMMessageModelImpl.FINDER_CACHE_ENABLED, PMMessageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByOwnerId",
 			new String[] {
 				Long.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OWNERID =
+		new FinderPath(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
+			PMMessageModelImpl.FINDER_CACHE_ENABLED, PMMessageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByOwnerId",
+			new String[] { Long.class.getName() },
+			PMMessageModelImpl.OWNERID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_OWNERID = new FinderPath(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
-			PMMessageModelImpl.FINDER_CACHE_ENABLED, FINDER_CLASS_NAME_LIST,
-			"countByOwnerId", new String[] { Long.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_BY_PARENTMESSAGEID = new FinderPath(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
-			PMMessageModelImpl.FINDER_CACHE_ENABLED, FINDER_CLASS_NAME_LIST,
-			"findByParentMessageId",
+			PMMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByOwnerId",
+			new String[] { Long.class.getName() });
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_BY_PARENTMESSAGEID =
+		new FinderPath(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
+			PMMessageModelImpl.FINDER_CACHE_ENABLED, PMMessageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findByParentMessageId",
 			new String[] {
 				Long.class.getName(),
 				
 			"java.lang.Integer", "java.lang.Integer",
 				"com.liferay.portal.kernel.util.OrderByComparator"
 			});
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_PARENTMESSAGEID =
+		new FinderPath(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
+			PMMessageModelImpl.FINDER_CACHE_ENABLED, PMMessageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findByParentMessageId",
+			new String[] { Long.class.getName() },
+			PMMessageModelImpl.PARENTMESSAGEID_COLUMN_BITMASK);
 	public static final FinderPath FINDER_PATH_COUNT_BY_PARENTMESSAGEID = new FinderPath(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
-			PMMessageModelImpl.FINDER_CACHE_ENABLED, FINDER_CLASS_NAME_LIST,
+			PMMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION,
 			"countByParentMessageId", new String[] { Long.class.getName() });
-	public static final FinderPath FINDER_PATH_FIND_ALL = new FinderPath(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
-			PMMessageModelImpl.FINDER_CACHE_ENABLED, FINDER_CLASS_NAME_LIST,
-			"findAll", new String[0]);
+	public static final FinderPath FINDER_PATH_WITH_PAGINATION_FIND_ALL = new FinderPath(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
+			PMMessageModelImpl.FINDER_CACHE_ENABLED, PMMessageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITH_PAGINATION, "findAll", new String[0]);
+	public static final FinderPath FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL = new FinderPath(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
+			PMMessageModelImpl.FINDER_CACHE_ENABLED, PMMessageImpl.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "findAll", new String[0]);
 	public static final FinderPath FINDER_PATH_COUNT_ALL = new FinderPath(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
-			PMMessageModelImpl.FINDER_CACHE_ENABLED, FINDER_CLASS_NAME_LIST,
-			"countAll", new String[0]);
+			PMMessageModelImpl.FINDER_CACHE_ENABLED, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countAll", new String[0]);
 
 	/**
 	 * Caches the p m message in the entity cache if it is enabled.
 	 *
-	 * @param pmMessage the p m message to cache
+	 * @param pmMessage the p m message
 	 */
 	public void cacheResult(PMMessage pmMessage) {
 		EntityCacheUtil.putResult(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
 			PMMessageImpl.class, pmMessage.getPrimaryKey(), pmMessage);
+
+		pmMessage.resetOriginalValues();
 	}
 
 	/**
 	 * Caches the p m messages in the entity cache if it is enabled.
 	 *
-	 * @param pmMessages the p m messages to cache
+	 * @param pmMessages the p m messages
 	 */
 	public void cacheResult(List<PMMessage> pmMessages) {
 		for (PMMessage pmMessage : pmMessages) {
 			if (EntityCacheUtil.getResult(
 						PMMessageModelImpl.ENTITY_CACHE_ENABLED,
-						PMMessageImpl.class, pmMessage.getPrimaryKey(), this) == null) {
+						PMMessageImpl.class, pmMessage.getPrimaryKey()) == null) {
 				cacheResult(pmMessage);
+			}
+			else {
+				pmMessage.resetOriginalValues();
 			}
 		}
 	}
@@ -135,11 +164,17 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
 	 * </p>
 	 */
+	@Override
 	public void clearCache() {
-		CacheRegistryUtil.clear(PMMessageImpl.class.getName());
+		if (_HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE) {
+			CacheRegistryUtil.clear(PMMessageImpl.class.getName());
+		}
+
 		EntityCacheUtil.clearCache(PMMessageImpl.class.getName());
+
 		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_ENTITY);
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
 	}
 
 	/**
@@ -149,9 +184,24 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	 * The {@link com.liferay.portal.kernel.dao.orm.EntityCache} and {@link com.liferay.portal.kernel.dao.orm.FinderCache} are both cleared by this method.
 	 * </p>
 	 */
+	@Override
 	public void clearCache(PMMessage pmMessage) {
 		EntityCacheUtil.removeResult(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
 			PMMessageImpl.class, pmMessage.getPrimaryKey());
+
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+	}
+
+	@Override
+	public void clearCache(List<PMMessage> pmMessages) {
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+
+		for (PMMessage pmMessage : pmMessages) {
+			EntityCacheUtil.removeResult(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
+				PMMessageImpl.class, pmMessage.getPrimaryKey());
+		}
 	}
 
 	/**
@@ -172,25 +222,26 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	/**
 	 * Removes the p m message with the primary key from the database. Also notifies the appropriate model listeners.
 	 *
-	 * @param primaryKey the primary key of the p m message to remove
-	 * @return the p m message that was removed
-	 * @throws com.liferay.portal.NoSuchModelException if a p m message with the primary key could not be found
-	 * @throws SystemException if a system exception occurred
-	 */
-	public PMMessage remove(Serializable primaryKey)
-		throws NoSuchModelException, SystemException {
-		return remove(((Long)primaryKey).longValue());
-	}
-
-	/**
-	 * Removes the p m message with the primary key from the database. Also notifies the appropriate model listeners.
-	 *
-	 * @param messageId the primary key of the p m message to remove
+	 * @param messageId the primary key of the p m message
 	 * @return the p m message that was removed
 	 * @throws com.dharma.NoSuchPMMessageException if a p m message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public PMMessage remove(long messageId)
+		throws NoSuchPMMessageException, SystemException {
+		return remove(Long.valueOf(messageId));
+	}
+
+	/**
+	 * Removes the p m message with the primary key from the database. Also notifies the appropriate model listeners.
+	 *
+	 * @param primaryKey the primary key of the p m message
+	 * @return the p m message that was removed
+	 * @throws com.dharma.NoSuchPMMessageException if a p m message with the primary key could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	@Override
+	public PMMessage remove(Serializable primaryKey)
 		throws NoSuchPMMessageException, SystemException {
 		Session session = null;
 
@@ -198,15 +249,15 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 			session = openSession();
 
 			PMMessage pmMessage = (PMMessage)session.get(PMMessageImpl.class,
-					new Long(messageId));
+					primaryKey);
 
 			if (pmMessage == null) {
 				if (_log.isWarnEnabled()) {
-					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + messageId);
+					_log.warn(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY + primaryKey);
 				}
 
 				throw new NoSuchPMMessageException(_NO_SUCH_ENTITY_WITH_PRIMARY_KEY +
-					messageId);
+					primaryKey);
 			}
 
 			return remove(pmMessage);
@@ -222,6 +273,7 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 		}
 	}
 
+	@Override
 	protected PMMessage removeImpl(PMMessage pmMessage)
 		throws SystemException {
 		pmMessage = toUnwrappedModel(pmMessage);
@@ -231,18 +283,7 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 		try {
 			session = openSession();
 
-			if (pmMessage.isCachedModel() || BatchSessionUtil.isEnabled()) {
-				Object staleObject = session.get(PMMessageImpl.class,
-						pmMessage.getPrimaryKeyObj());
-
-				if (staleObject != null) {
-					session.evict(staleObject);
-				}
-			}
-
-			session.delete(pmMessage);
-
-			session.flush();
+			BatchSessionUtil.delete(session, pmMessage);
 		}
 		catch (Exception e) {
 			throw processException(e);
@@ -251,17 +292,19 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
-
-		EntityCacheUtil.removeResult(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
-			PMMessageImpl.class, pmMessage.getPrimaryKey());
+		clearCache(pmMessage);
 
 		return pmMessage;
 	}
 
+	@Override
 	public PMMessage updateImpl(com.dharma.model.PMMessage pmMessage,
 		boolean merge) throws SystemException {
 		pmMessage = toUnwrappedModel(pmMessage);
+
+		boolean isNew = pmMessage.isNew();
+
+		PMMessageModelImpl pmMessageModelImpl = (PMMessageModelImpl)pmMessage;
 
 		Session session = null;
 
@@ -279,7 +322,53 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 			closeSession(session);
 		}
 
-		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST);
+		FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITH_PAGINATION);
+
+		if (isNew || !PMMessageModelImpl.COLUMN_BITMASK_ENABLED) {
+			FinderCacheUtil.clearCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+		}
+
+		else {
+			if ((pmMessageModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OWNERID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(pmMessageModelImpl.getOriginalOwnerId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_OWNERID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OWNERID,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(pmMessageModelImpl.getOwnerId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_OWNERID, args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OWNERID,
+					args);
+			}
+
+			if ((pmMessageModelImpl.getColumnBitmask() &
+					FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_PARENTMESSAGEID.getColumnBitmask()) != 0) {
+				Object[] args = new Object[] {
+						Long.valueOf(pmMessageModelImpl.getOriginalParentMessageId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_PARENTMESSAGEID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_PARENTMESSAGEID,
+					args);
+
+				args = new Object[] {
+						Long.valueOf(pmMessageModelImpl.getParentMessageId())
+					};
+
+				FinderCacheUtil.removeResult(FINDER_PATH_COUNT_BY_PARENTMESSAGEID,
+					args);
+				FinderCacheUtil.removeResult(FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_PARENTMESSAGEID,
+					args);
+			}
+		}
 
 		EntityCacheUtil.putResult(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
 			PMMessageImpl.class, pmMessage.getPrimaryKey(), pmMessage);
@@ -310,22 +399,23 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Finds the p m message with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
+	 * Returns the p m message with the primary key or throws a {@link com.liferay.portal.NoSuchModelException} if it could not be found.
 	 *
-	 * @param primaryKey the primary key of the p m message to find
+	 * @param primaryKey the primary key of the p m message
 	 * @return the p m message
 	 * @throws com.liferay.portal.NoSuchModelException if a p m message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public PMMessage findByPrimaryKey(Serializable primaryKey)
 		throws NoSuchModelException, SystemException {
 		return findByPrimaryKey(((Long)primaryKey).longValue());
 	}
 
 	/**
-	 * Finds the p m message with the primary key or throws a {@link com.dharma.NoSuchPMMessageException} if it could not be found.
+	 * Returns the p m message with the primary key or throws a {@link com.dharma.NoSuchPMMessageException} if it could not be found.
 	 *
-	 * @param messageId the primary key of the p m message to find
+	 * @param messageId the primary key of the p m message
 	 * @return the p m message
 	 * @throws com.dharma.NoSuchPMMessageException if a p m message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
@@ -347,44 +437,57 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Finds the p m message with the primary key or returns <code>null</code> if it could not be found.
+	 * Returns the p m message with the primary key or returns <code>null</code> if it could not be found.
 	 *
-	 * @param primaryKey the primary key of the p m message to find
+	 * @param primaryKey the primary key of the p m message
 	 * @return the p m message, or <code>null</code> if a p m message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Override
 	public PMMessage fetchByPrimaryKey(Serializable primaryKey)
 		throws SystemException {
 		return fetchByPrimaryKey(((Long)primaryKey).longValue());
 	}
 
 	/**
-	 * Finds the p m message with the primary key or returns <code>null</code> if it could not be found.
+	 * Returns the p m message with the primary key or returns <code>null</code> if it could not be found.
 	 *
-	 * @param messageId the primary key of the p m message to find
+	 * @param messageId the primary key of the p m message
 	 * @return the p m message, or <code>null</code> if a p m message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public PMMessage fetchByPrimaryKey(long messageId)
 		throws SystemException {
 		PMMessage pmMessage = (PMMessage)EntityCacheUtil.getResult(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
-				PMMessageImpl.class, messageId, this);
+				PMMessageImpl.class, messageId);
+
+		if (pmMessage == _nullPMMessage) {
+			return null;
+		}
 
 		if (pmMessage == null) {
 			Session session = null;
+
+			boolean hasException = false;
 
 			try {
 				session = openSession();
 
 				pmMessage = (PMMessage)session.get(PMMessageImpl.class,
-						new Long(messageId));
+						Long.valueOf(messageId));
 			}
 			catch (Exception e) {
+				hasException = true;
+
 				throw processException(e);
 			}
 			finally {
 				if (pmMessage != null) {
 					cacheResult(pmMessage);
+				}
+				else if (!hasException) {
+					EntityCacheUtil.putResult(PMMessageModelImpl.ENTITY_CACHE_ENABLED,
+						PMMessageImpl.class, messageId, _nullPMMessage);
 				}
 
 				closeSession(session);
@@ -395,9 +498,9 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Finds all the p m messages where ownerId = &#63;.
+	 * Returns all the p m messages where ownerId = &#63;.
 	 *
-	 * @param ownerId the owner id to search with
+	 * @param ownerId the owner ID
 	 * @return the matching p m messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -407,15 +510,15 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Finds a range of all the p m messages where ownerId = &#63;.
+	 * Returns a range of all the p m messages where ownerId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
-	 * @param ownerId the owner id to search with
-	 * @param start the lower bound of the range of p m messages to return
-	 * @param end the upper bound of the range of p m messages to return (not inclusive)
+	 * @param ownerId the owner ID
+	 * @param start the lower bound of the range of p m messages
+	 * @param end the upper bound of the range of p m messages (not inclusive)
 	 * @return the range of matching p m messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -425,61 +528,77 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Finds an ordered range of all the p m messages where ownerId = &#63;.
+	 * Returns an ordered range of all the p m messages where ownerId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
-	 * @param ownerId the owner id to search with
-	 * @param start the lower bound of the range of p m messages to return
-	 * @param end the upper bound of the range of p m messages to return (not inclusive)
-	 * @param orderByComparator the comparator to order the results by
+	 * @param ownerId the owner ID
+	 * @param start the lower bound of the range of p m messages
+	 * @param end the upper bound of the range of p m messages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching p m messages
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<PMMessage> findByOwnerId(long ownerId, int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				ownerId,
-				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		List<PMMessage> list = (List<PMMessage>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_OWNERID,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_OWNERID;
+			finderArgs = new Object[] { ownerId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_OWNERID;
+			finderArgs = new Object[] { ownerId, start, end, orderByComparator };
+		}
+
+		List<PMMessage> list = (List<PMMessage>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
 
+		if ((list != null) && !list.isEmpty()) {
+			for (PMMessage pmMessage : list) {
+				if ((ownerId != pmMessage.getOwnerId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
 		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(3);
+			}
+
+			query.append(_SQL_SELECT_PMMESSAGE_WHERE);
+
+			query.append(_FINDER_COLUMN_OWNERID_OWNERID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+
+			else {
+				query.append(PMMessageModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
 			Session session = null;
 
 			try {
 				session = openSession();
-
-				StringBundler query = null;
-
-				if (orderByComparator != null) {
-					query = new StringBundler(3 +
-							(orderByComparator.getOrderByFields().length * 3));
-				}
-				else {
-					query = new StringBundler(3);
-				}
-
-				query.append(_SQL_SELECT_PMMESSAGE_WHERE);
-
-				query.append(_FINDER_COLUMN_OWNERID_OWNERID_2);
-
-				if (orderByComparator != null) {
-					appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-						orderByComparator);
-				}
-
-				else {
-					query.append(PMMessageModelImpl.ORDER_BY_JPQL);
-				}
-
-				String sql = query.toString();
 
 				Query q = session.createQuery(sql);
 
@@ -495,13 +614,13 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 			}
 			finally {
 				if (list == null) {
-					list = new ArrayList<PMMessage>();
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
+				else {
+					cacheResult(list);
 
-				cacheResult(list);
-
-				FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_OWNERID,
-					finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 
 				closeSession(session);
 			}
@@ -511,14 +630,10 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Finds the first p m message in the ordered set where ownerId = &#63;.
+	 * Returns the first p m message in the ordered set where ownerId = &#63;.
 	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
-	 *
-	 * @param ownerId the owner id to search with
-	 * @param orderByComparator the comparator to order the set by
+	 * @param ownerId the owner ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching p m message
 	 * @throws com.dharma.NoSuchPMMessageException if a matching p m message could not be found
 	 * @throws SystemException if a system exception occurred
@@ -526,34 +641,48 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	public PMMessage findByOwnerId_First(long ownerId,
 		OrderByComparator orderByComparator)
 		throws NoSuchPMMessageException, SystemException {
-		List<PMMessage> list = findByOwnerId(ownerId, 0, 1, orderByComparator);
+		PMMessage pmMessage = fetchByOwnerId_First(ownerId, orderByComparator);
 
-		if (list.isEmpty()) {
-			StringBundler msg = new StringBundler(4);
-
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			msg.append("ownerId=");
-			msg.append(ownerId);
-
-			msg.append(StringPool.CLOSE_CURLY_BRACE);
-
-			throw new NoSuchPMMessageException(msg.toString());
+		if (pmMessage != null) {
+			return pmMessage;
 		}
-		else {
-			return list.get(0);
-		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("ownerId=");
+		msg.append(ownerId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchPMMessageException(msg.toString());
 	}
 
 	/**
-	 * Finds the last p m message in the ordered set where ownerId = &#63;.
+	 * Returns the first p m message in the ordered set where ownerId = &#63;.
 	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
+	 * @param ownerId the owner ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching p m message, or <code>null</code> if a matching p m message could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public PMMessage fetchByOwnerId_First(long ownerId,
+		OrderByComparator orderByComparator) throws SystemException {
+		List<PMMessage> list = findByOwnerId(ownerId, 0, 1, orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last p m message in the ordered set where ownerId = &#63;.
 	 *
-	 * @param ownerId the owner id to search with
-	 * @param orderByComparator the comparator to order the set by
+	 * @param ownerId the owner ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching p m message
 	 * @throws com.dharma.NoSuchPMMessageException if a matching p m message could not be found
 	 * @throws SystemException if a system exception occurred
@@ -561,38 +690,52 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	public PMMessage findByOwnerId_Last(long ownerId,
 		OrderByComparator orderByComparator)
 		throws NoSuchPMMessageException, SystemException {
+		PMMessage pmMessage = fetchByOwnerId_Last(ownerId, orderByComparator);
+
+		if (pmMessage != null) {
+			return pmMessage;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("ownerId=");
+		msg.append(ownerId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchPMMessageException(msg.toString());
+	}
+
+	/**
+	 * Returns the last p m message in the ordered set where ownerId = &#63;.
+	 *
+	 * @param ownerId the owner ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching p m message, or <code>null</code> if a matching p m message could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public PMMessage fetchByOwnerId_Last(long ownerId,
+		OrderByComparator orderByComparator) throws SystemException {
 		int count = countByOwnerId(ownerId);
 
 		List<PMMessage> list = findByOwnerId(ownerId, count - 1, count,
 				orderByComparator);
 
-		if (list.isEmpty()) {
-			StringBundler msg = new StringBundler(4);
-
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			msg.append("ownerId=");
-			msg.append(ownerId);
-
-			msg.append(StringPool.CLOSE_CURLY_BRACE);
-
-			throw new NoSuchPMMessageException(msg.toString());
-		}
-		else {
+		if (!list.isEmpty()) {
 			return list.get(0);
 		}
+
+		return null;
 	}
 
 	/**
-	 * Finds the p m messages before and after the current p m message in the ordered set where ownerId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
+	 * Returns the p m messages before and after the current p m message in the ordered set where ownerId = &#63;.
 	 *
 	 * @param messageId the primary key of the current p m message
-	 * @param ownerId the owner id to search with
-	 * @param orderByComparator the comparator to order the set by
+	 * @param ownerId the owner ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next p m message
 	 * @throws com.dharma.NoSuchPMMessageException if a p m message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
@@ -645,17 +788,17 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 		query.append(_FINDER_COLUMN_OWNERID_OWNERID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -674,6 +817,8 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -714,7 +859,7 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 		qPos.add(ownerId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(pmMessage);
+			Object[] values = orderByComparator.getOrderByConditionValues(pmMessage);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -732,9 +877,9 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Finds all the p m messages where parentMessageId = &#63;.
+	 * Returns all the p m messages where parentMessageId = &#63;.
 	 *
-	 * @param parentMessageId the parent message id to search with
+	 * @param parentMessageId the parent message ID
 	 * @return the matching p m messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -745,15 +890,15 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Finds a range of all the p m messages where parentMessageId = &#63;.
+	 * Returns a range of all the p m messages where parentMessageId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
-	 * @param parentMessageId the parent message id to search with
-	 * @param start the lower bound of the range of p m messages to return
-	 * @param end the upper bound of the range of p m messages to return (not inclusive)
+	 * @param parentMessageId the parent message ID
+	 * @param start the lower bound of the range of p m messages
+	 * @param end the upper bound of the range of p m messages (not inclusive)
 	 * @return the range of matching p m messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -763,62 +908,82 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Finds an ordered range of all the p m messages where parentMessageId = &#63;.
+	 * Returns an ordered range of all the p m messages where parentMessageId = &#63;.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
-	 * @param parentMessageId the parent message id to search with
-	 * @param start the lower bound of the range of p m messages to return
-	 * @param end the upper bound of the range of p m messages to return (not inclusive)
-	 * @param orderByComparator the comparator to order the results by
+	 * @param parentMessageId the parent message ID
+	 * @param start the lower bound of the range of p m messages
+	 * @param end the upper bound of the range of p m messages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of matching p m messages
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<PMMessage> findByParentMessageId(long parentMessageId,
 		int start, int end, OrderByComparator orderByComparator)
 		throws SystemException {
-		Object[] finderArgs = new Object[] {
-				parentMessageId,
-				
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = null;
 
-		List<PMMessage> list = (List<PMMessage>)FinderCacheUtil.getResult(FINDER_PATH_FIND_BY_PARENTMESSAGEID,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_BY_PARENTMESSAGEID;
+			finderArgs = new Object[] { parentMessageId };
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_BY_PARENTMESSAGEID;
+			finderArgs = new Object[] {
+					parentMessageId,
+					
+					start, end, orderByComparator
+				};
+		}
+
+		List<PMMessage> list = (List<PMMessage>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
 
+		if ((list != null) && !list.isEmpty()) {
+			for (PMMessage pmMessage : list) {
+				if ((parentMessageId != pmMessage.getParentMessageId())) {
+					list = null;
+
+					break;
+				}
+			}
+		}
+
 		if (list == null) {
+			StringBundler query = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(3 +
+						(orderByComparator.getOrderByFields().length * 3));
+			}
+			else {
+				query = new StringBundler(3);
+			}
+
+			query.append(_SQL_SELECT_PMMESSAGE_WHERE);
+
+			query.append(_FINDER_COLUMN_PARENTMESSAGEID_PARENTMESSAGEID_2);
+
+			if (orderByComparator != null) {
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+			}
+
+			else {
+				query.append(PMMessageModelImpl.ORDER_BY_JPQL);
+			}
+
+			String sql = query.toString();
+
 			Session session = null;
 
 			try {
 				session = openSession();
-
-				StringBundler query = null;
-
-				if (orderByComparator != null) {
-					query = new StringBundler(3 +
-							(orderByComparator.getOrderByFields().length * 3));
-				}
-				else {
-					query = new StringBundler(3);
-				}
-
-				query.append(_SQL_SELECT_PMMESSAGE_WHERE);
-
-				query.append(_FINDER_COLUMN_PARENTMESSAGEID_PARENTMESSAGEID_2);
-
-				if (orderByComparator != null) {
-					appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-						orderByComparator);
-				}
-
-				else {
-					query.append(PMMessageModelImpl.ORDER_BY_JPQL);
-				}
-
-				String sql = query.toString();
 
 				Query q = session.createQuery(sql);
 
@@ -834,13 +999,13 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 			}
 			finally {
 				if (list == null) {
-					list = new ArrayList<PMMessage>();
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
+				else {
+					cacheResult(list);
 
-				cacheResult(list);
-
-				FinderCacheUtil.putResult(FINDER_PATH_FIND_BY_PARENTMESSAGEID,
-					finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 
 				closeSession(session);
 			}
@@ -850,14 +1015,10 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Finds the first p m message in the ordered set where parentMessageId = &#63;.
+	 * Returns the first p m message in the ordered set where parentMessageId = &#63;.
 	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
-	 *
-	 * @param parentMessageId the parent message id to search with
-	 * @param orderByComparator the comparator to order the set by
+	 * @param parentMessageId the parent message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the first matching p m message
 	 * @throws com.dharma.NoSuchPMMessageException if a matching p m message could not be found
 	 * @throws SystemException if a system exception occurred
@@ -865,35 +1026,50 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	public PMMessage findByParentMessageId_First(long parentMessageId,
 		OrderByComparator orderByComparator)
 		throws NoSuchPMMessageException, SystemException {
-		List<PMMessage> list = findByParentMessageId(parentMessageId, 0, 1,
+		PMMessage pmMessage = fetchByParentMessageId_First(parentMessageId,
 				orderByComparator);
 
-		if (list.isEmpty()) {
-			StringBundler msg = new StringBundler(4);
-
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			msg.append("parentMessageId=");
-			msg.append(parentMessageId);
-
-			msg.append(StringPool.CLOSE_CURLY_BRACE);
-
-			throw new NoSuchPMMessageException(msg.toString());
+		if (pmMessage != null) {
+			return pmMessage;
 		}
-		else {
-			return list.get(0);
-		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("parentMessageId=");
+		msg.append(parentMessageId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchPMMessageException(msg.toString());
 	}
 
 	/**
-	 * Finds the last p m message in the ordered set where parentMessageId = &#63;.
+	 * Returns the first p m message in the ordered set where parentMessageId = &#63;.
 	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
+	 * @param parentMessageId the parent message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the first matching p m message, or <code>null</code> if a matching p m message could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public PMMessage fetchByParentMessageId_First(long parentMessageId,
+		OrderByComparator orderByComparator) throws SystemException {
+		List<PMMessage> list = findByParentMessageId(parentMessageId, 0, 1,
+				orderByComparator);
+
+		if (!list.isEmpty()) {
+			return list.get(0);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the last p m message in the ordered set where parentMessageId = &#63;.
 	 *
-	 * @param parentMessageId the parent message id to search with
-	 * @param orderByComparator the comparator to order the set by
+	 * @param parentMessageId the parent message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the last matching p m message
 	 * @throws com.dharma.NoSuchPMMessageException if a matching p m message could not be found
 	 * @throws SystemException if a system exception occurred
@@ -901,38 +1077,53 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	public PMMessage findByParentMessageId_Last(long parentMessageId,
 		OrderByComparator orderByComparator)
 		throws NoSuchPMMessageException, SystemException {
+		PMMessage pmMessage = fetchByParentMessageId_Last(parentMessageId,
+				orderByComparator);
+
+		if (pmMessage != null) {
+			return pmMessage;
+		}
+
+		StringBundler msg = new StringBundler(4);
+
+		msg.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+		msg.append("parentMessageId=");
+		msg.append(parentMessageId);
+
+		msg.append(StringPool.CLOSE_CURLY_BRACE);
+
+		throw new NoSuchPMMessageException(msg.toString());
+	}
+
+	/**
+	 * Returns the last p m message in the ordered set where parentMessageId = &#63;.
+	 *
+	 * @param parentMessageId the parent message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	 * @return the last matching p m message, or <code>null</code> if a matching p m message could not be found
+	 * @throws SystemException if a system exception occurred
+	 */
+	public PMMessage fetchByParentMessageId_Last(long parentMessageId,
+		OrderByComparator orderByComparator) throws SystemException {
 		int count = countByParentMessageId(parentMessageId);
 
 		List<PMMessage> list = findByParentMessageId(parentMessageId,
 				count - 1, count, orderByComparator);
 
-		if (list.isEmpty()) {
-			StringBundler msg = new StringBundler(4);
-
-			msg.append(_NO_SUCH_ENTITY_WITH_KEY);
-
-			msg.append("parentMessageId=");
-			msg.append(parentMessageId);
-
-			msg.append(StringPool.CLOSE_CURLY_BRACE);
-
-			throw new NoSuchPMMessageException(msg.toString());
-		}
-		else {
+		if (!list.isEmpty()) {
 			return list.get(0);
 		}
+
+		return null;
 	}
 
 	/**
-	 * Finds the p m messages before and after the current p m message in the ordered set where parentMessageId = &#63;.
-	 *
-	 * <p>
-	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	 * </p>
+	 * Returns the p m messages before and after the current p m message in the ordered set where parentMessageId = &#63;.
 	 *
 	 * @param messageId the primary key of the current p m message
-	 * @param parentMessageId the parent message id to search with
-	 * @param orderByComparator the comparator to order the set by
+	 * @param parentMessageId the parent message ID
+	 * @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	 * @return the previous, current, and next p m message
 	 * @throws com.dharma.NoSuchPMMessageException if a p m message with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
@@ -985,17 +1176,17 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 		query.append(_FINDER_COLUMN_PARENTMESSAGEID_PARENTMESSAGEID_2);
 
 		if (orderByComparator != null) {
-			String[] orderByFields = orderByComparator.getOrderByFields();
+			String[] orderByConditionFields = orderByComparator.getOrderByConditionFields();
 
-			if (orderByFields.length > 0) {
+			if (orderByConditionFields.length > 0) {
 				query.append(WHERE_AND);
 			}
 
-			for (int i = 0; i < orderByFields.length; i++) {
+			for (int i = 0; i < orderByConditionFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
-				query.append(orderByFields[i]);
+				query.append(orderByConditionFields[i]);
 
-				if ((i + 1) < orderByFields.length) {
+				if ((i + 1) < orderByConditionFields.length) {
 					if (orderByComparator.isAscending() ^ previous) {
 						query.append(WHERE_GREATER_THAN_HAS_NEXT);
 					}
@@ -1014,6 +1205,8 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 			}
 
 			query.append(ORDER_BY_CLAUSE);
+
+			String[] orderByFields = orderByComparator.getOrderByFields();
 
 			for (int i = 0; i < orderByFields.length; i++) {
 				query.append(_ORDER_BY_ENTITY_ALIAS);
@@ -1054,7 +1247,7 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 		qPos.add(parentMessageId);
 
 		if (orderByComparator != null) {
-			Object[] values = orderByComparator.getOrderByValues(pmMessage);
+			Object[] values = orderByComparator.getOrderByConditionValues(pmMessage);
 
 			for (Object value : values) {
 				qPos.add(value);
@@ -1072,7 +1265,7 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Finds all the p m messages.
+	 * Returns all the p m messages.
 	 *
 	 * @return the p m messages
 	 * @throws SystemException if a system exception occurred
@@ -1082,14 +1275,14 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Finds a range of all the p m messages.
+	 * Returns a range of all the p m messages.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
-	 * @param start the lower bound of the range of p m messages to return
-	 * @param end the upper bound of the range of p m messages to return (not inclusive)
+	 * @param start the lower bound of the range of p m messages
+	 * @param end the upper bound of the range of p m messages (not inclusive)
 	 * @return the range of p m messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -1099,51 +1292,59 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Finds an ordered range of all the p m messages.
+	 * Returns an ordered range of all the p m messages.
 	 *
 	 * <p>
 	 * Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	 * </p>
 	 *
-	 * @param start the lower bound of the range of p m messages to return
-	 * @param end the upper bound of the range of p m messages to return (not inclusive)
-	 * @param orderByComparator the comparator to order the results by
+	 * @param start the lower bound of the range of p m messages
+	 * @param end the upper bound of the range of p m messages (not inclusive)
+	 * @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	 * @return the ordered range of p m messages
 	 * @throws SystemException if a system exception occurred
 	 */
 	public List<PMMessage> findAll(int start, int end,
 		OrderByComparator orderByComparator) throws SystemException {
-		Object[] finderArgs = new Object[] {
-				String.valueOf(start), String.valueOf(end),
-				String.valueOf(orderByComparator)
-			};
+		FinderPath finderPath = null;
+		Object[] finderArgs = new Object[] { start, end, orderByComparator };
 
-		List<PMMessage> list = (List<PMMessage>)FinderCacheUtil.getResult(FINDER_PATH_FIND_ALL,
+		if ((start == QueryUtil.ALL_POS) && (end == QueryUtil.ALL_POS) &&
+				(orderByComparator == null)) {
+			finderPath = FINDER_PATH_WITHOUT_PAGINATION_FIND_ALL;
+			finderArgs = FINDER_ARGS_EMPTY;
+		}
+		else {
+			finderPath = FINDER_PATH_WITH_PAGINATION_FIND_ALL;
+			finderArgs = new Object[] { start, end, orderByComparator };
+		}
+
+		List<PMMessage> list = (List<PMMessage>)FinderCacheUtil.getResult(finderPath,
 				finderArgs, this);
 
 		if (list == null) {
+			StringBundler query = null;
+			String sql = null;
+
+			if (orderByComparator != null) {
+				query = new StringBundler(2 +
+						(orderByComparator.getOrderByFields().length * 3));
+
+				query.append(_SQL_SELECT_PMMESSAGE);
+
+				appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
+					orderByComparator);
+
+				sql = query.toString();
+			}
+			else {
+				sql = _SQL_SELECT_PMMESSAGE.concat(PMMessageModelImpl.ORDER_BY_JPQL);
+			}
+
 			Session session = null;
 
 			try {
 				session = openSession();
-
-				StringBundler query = null;
-				String sql = null;
-
-				if (orderByComparator != null) {
-					query = new StringBundler(2 +
-							(orderByComparator.getOrderByFields().length * 3));
-
-					query.append(_SQL_SELECT_PMMESSAGE);
-
-					appendOrderByComparator(query, _ORDER_BY_ENTITY_ALIAS,
-						orderByComparator);
-
-					sql = query.toString();
-				}
-				else {
-					sql = _SQL_SELECT_PMMESSAGE.concat(PMMessageModelImpl.ORDER_BY_JPQL);
-				}
 
 				Query q = session.createQuery(sql);
 
@@ -1163,12 +1364,13 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 			}
 			finally {
 				if (list == null) {
-					list = new ArrayList<PMMessage>();
+					FinderCacheUtil.removeResult(finderPath, finderArgs);
 				}
+				else {
+					cacheResult(list);
 
-				cacheResult(list);
-
-				FinderCacheUtil.putResult(FINDER_PATH_FIND_ALL, finderArgs, list);
+					FinderCacheUtil.putResult(finderPath, finderArgs, list);
+				}
 
 				closeSession(session);
 			}
@@ -1180,7 +1382,7 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	/**
 	 * Removes all the p m messages where ownerId = &#63; from the database.
 	 *
-	 * @param ownerId the owner id to search with
+	 * @param ownerId the owner ID
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void removeByOwnerId(long ownerId) throws SystemException {
@@ -1192,7 +1394,7 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	/**
 	 * Removes all the p m messages where parentMessageId = &#63; from the database.
 	 *
-	 * @param parentMessageId the parent message id to search with
+	 * @param parentMessageId the parent message ID
 	 * @throws SystemException if a system exception occurred
 	 */
 	public void removeByParentMessageId(long parentMessageId)
@@ -1214,9 +1416,9 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Counts all the p m messages where ownerId = &#63;.
+	 * Returns the number of p m messages where ownerId = &#63;.
 	 *
-	 * @param ownerId the owner id to search with
+	 * @param ownerId the owner ID
 	 * @return the number of matching p m messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -1227,18 +1429,18 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 				finderArgs, this);
 
 		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_PMMESSAGE_WHERE);
+
+			query.append(_FINDER_COLUMN_OWNERID_OWNERID_2);
+
+			String sql = query.toString();
+
 			Session session = null;
 
 			try {
 				session = openSession();
-
-				StringBundler query = new StringBundler(2);
-
-				query.append(_SQL_COUNT_PMMESSAGE_WHERE);
-
-				query.append(_FINDER_COLUMN_OWNERID_OWNERID_2);
-
-				String sql = query.toString();
 
 				Query q = session.createQuery(sql);
 
@@ -1267,9 +1469,9 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Counts all the p m messages where parentMessageId = &#63;.
+	 * Returns the number of p m messages where parentMessageId = &#63;.
 	 *
-	 * @param parentMessageId the parent message id to search with
+	 * @param parentMessageId the parent message ID
 	 * @return the number of matching p m messages
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -1281,18 +1483,18 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 				finderArgs, this);
 
 		if (count == null) {
+			StringBundler query = new StringBundler(2);
+
+			query.append(_SQL_COUNT_PMMESSAGE_WHERE);
+
+			query.append(_FINDER_COLUMN_PARENTMESSAGEID_PARENTMESSAGEID_2);
+
+			String sql = query.toString();
+
 			Session session = null;
 
 			try {
 				session = openSession();
-
-				StringBundler query = new StringBundler(2);
-
-				query.append(_SQL_COUNT_PMMESSAGE_WHERE);
-
-				query.append(_FINDER_COLUMN_PARENTMESSAGEID_PARENTMESSAGEID_2);
-
-				String sql = query.toString();
 
 				Query q = session.createQuery(sql);
 
@@ -1321,16 +1523,14 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	}
 
 	/**
-	 * Counts all the p m messages.
+	 * Returns the number of p m messages.
 	 *
 	 * @return the number of p m messages
 	 * @throws SystemException if a system exception occurred
 	 */
 	public int countAll() throws SystemException {
-		Object[] finderArgs = new Object[0];
-
 		Long count = (Long)FinderCacheUtil.getResult(FINDER_PATH_COUNT_ALL,
-				finderArgs, this);
+				FINDER_ARGS_EMPTY, this);
 
 		if (count == null) {
 			Session session = null;
@@ -1350,8 +1550,8 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 					count = Long.valueOf(0);
 				}
 
-				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL, finderArgs,
-					count);
+				FinderCacheUtil.putResult(FINDER_PATH_COUNT_ALL,
+					FINDER_ARGS_EMPTY, count);
 
 				closeSession(session);
 			}
@@ -1385,14 +1585,20 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 		}
 	}
 
-	@BeanReference(type = PMMessagePersistence.class)
-	protected PMMessagePersistence pmMessagePersistence;
-	@BeanReference(type = PMDeletedMessagePersistence.class)
-	protected PMDeletedMessagePersistence pmDeletedMessagePersistence;
-	@BeanReference(type = PMReadMessagePersistence.class)
-	protected PMReadMessagePersistence pmReadMessagePersistence;
+	public void destroy() {
+		EntityCacheUtil.removeCache(PMMessageImpl.class.getName());
+		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_ENTITY);
+		FinderCacheUtil.removeCache(FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION);
+	}
+
 	@BeanReference(type = PMBlockedUserPersistence.class)
 	protected PMBlockedUserPersistence pmBlockedUserPersistence;
+	@BeanReference(type = PMDeletedMessagePersistence.class)
+	protected PMDeletedMessagePersistence pmDeletedMessagePersistence;
+	@BeanReference(type = PMMessagePersistence.class)
+	protected PMMessagePersistence pmMessagePersistence;
+	@BeanReference(type = PMReadMessagePersistence.class)
+	protected PMReadMessagePersistence pmReadMessagePersistence;
 	@BeanReference(type = ResourcePersistence.class)
 	protected ResourcePersistence resourcePersistence;
 	@BeanReference(type = UserPersistence.class)
@@ -1407,5 +1613,24 @@ public class PMMessagePersistenceImpl extends BasePersistenceImpl<PMMessage>
 	private static final String _ORDER_BY_ENTITY_ALIAS = "pmMessage.";
 	private static final String _NO_SUCH_ENTITY_WITH_PRIMARY_KEY = "No PMMessage exists with the primary key ";
 	private static final String _NO_SUCH_ENTITY_WITH_KEY = "No PMMessage exists with the key {";
+	private static final boolean _HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE = GetterUtil.getBoolean(PropsUtil.get(
+				PropsKeys.HIBERNATE_CACHE_USE_SECOND_LEVEL_CACHE));
 	private static Log _log = LogFactoryUtil.getLog(PMMessagePersistenceImpl.class);
+	private static PMMessage _nullPMMessage = new PMMessageImpl() {
+			@Override
+			public Object clone() {
+				return this;
+			}
+
+			@Override
+			public CacheModel<PMMessage> toCacheModel() {
+				return _nullPMMessageCacheModel;
+			}
+		};
+
+	private static CacheModel<PMMessage> _nullPMMessageCacheModel = new CacheModel<PMMessage>() {
+			public PMMessage toEntityModel() {
+				return _nullPMMessage;
+			}
+		};
 }

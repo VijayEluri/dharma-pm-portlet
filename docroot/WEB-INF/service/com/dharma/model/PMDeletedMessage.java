@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,16 +14,10 @@
 
 package com.dharma.model;
 
+import com.liferay.portal.model.PersistedModel;
+
 /**
- * The model interface for the PMDeletedMessage service. Represents a row in the &quot;deleted_message&quot; database table, with each column mapped to a property of this class.
- *
- * <p>
- * Never modify this interface directly. Add methods to {@link com.dharma.model.impl.PMDeletedMessageImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
- * </p>
- *
- * <p>
- * Never reference this interface directly. All methods that expect a p m deleted message model instance should use the {@link PMDeletedMessage} interface instead.
- * </p>
+ * The extended model interface for the PMDeletedMessage service. Represents a row in the &quot;deleted_message&quot; database table, with each column mapped to a property of this class.
  *
  * @author Brian Wing Shun Chan
  * @see PMDeletedMessageModel
@@ -31,5 +25,10 @@ package com.dharma.model;
  * @see com.dharma.model.impl.PMDeletedMessageModelImpl
  * @generated
  */
-public interface PMDeletedMessage extends PMDeletedMessageModel {
+public interface PMDeletedMessage extends PMDeletedMessageModel, PersistedModel {
+	/*
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify this interface directly. Add methods to {@link com.dharma.model.impl.PMDeletedMessageImpl} and rerun ServiceBuilder to automatically copy the method declarations to this interface.
+	 */
 }

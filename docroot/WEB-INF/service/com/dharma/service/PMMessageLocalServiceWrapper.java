@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,6 +14,8 @@
 
 package com.dharma.service;
 
+import com.liferay.portal.service.ServiceWrapper;
+
 /**
  * <p>
  * This class is a wrapper for {@link PMMessageLocalService}.
@@ -23,7 +25,8 @@ package com.dharma.service;
  * @see       PMMessageLocalService
  * @generated
  */
-public class PMMessageLocalServiceWrapper implements PMMessageLocalService {
+public class PMMessageLocalServiceWrapper implements PMMessageLocalService,
+	ServiceWrapper<PMMessageLocalService> {
 	public PMMessageLocalServiceWrapper(
 		PMMessageLocalService pmMessageLocalService) {
 		_pmMessageLocalService = pmMessageLocalService;
@@ -32,7 +35,7 @@ public class PMMessageLocalServiceWrapper implements PMMessageLocalService {
 	/**
 	* Adds the p m message to the database. Also notifies the appropriate model listeners.
 	*
-	* @param pmMessage the p m message to add
+	* @param pmMessage the p m message
 	* @return the p m message that was added
 	* @throws SystemException if a system exception occurred
 	*/
@@ -55,31 +58,38 @@ public class PMMessageLocalServiceWrapper implements PMMessageLocalService {
 	/**
 	* Deletes the p m message with the primary key from the database. Also notifies the appropriate model listeners.
 	*
-	* @param messageId the primary key of the p m message to delete
+	* @param messageId the primary key of the p m message
+	* @return the p m message that was removed
 	* @throws PortalException if a p m message with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePMMessage(long messageId)
+	public com.dharma.model.PMMessage deletePMMessage(long messageId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		_pmMessageLocalService.deletePMMessage(messageId);
+		return _pmMessageLocalService.deletePMMessage(messageId);
 	}
 
 	/**
 	* Deletes the p m message from the database. Also notifies the appropriate model listeners.
 	*
-	* @param pmMessage the p m message to delete
+	* @param pmMessage the p m message
+	* @return the p m message that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public void deletePMMessage(com.dharma.model.PMMessage pmMessage)
+	public com.dharma.model.PMMessage deletePMMessage(
+		com.dharma.model.PMMessage pmMessage)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		_pmMessageLocalService.deletePMMessage(pmMessage);
+		return _pmMessageLocalService.deletePMMessage(pmMessage);
+	}
+
+	public com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return _pmMessageLocalService.dynamicQuery();
 	}
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
 	*
-	* @param dynamicQuery the dynamic query to search with
+	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	* @throws SystemException if a system exception occurred
 	*/
@@ -97,9 +107,9 @@ public class PMMessageLocalServiceWrapper implements PMMessageLocalService {
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param dynamicQuery the dynamic query to search with
-	* @param start the lower bound of the range of model instances to return
-	* @param end the upper bound of the range of model instances to return (not inclusive)
+	* @param dynamicQuery the dynamic query
+	* @param start the lower bound of the range of model instances
+	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	* @throws SystemException if a system exception occurred
 	*/
@@ -117,10 +127,10 @@ public class PMMessageLocalServiceWrapper implements PMMessageLocalService {
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param dynamicQuery the dynamic query to search with
-	* @param start the lower bound of the range of model instances to return
-	* @param end the upper bound of the range of model instances to return (not inclusive)
-	* @param orderByComparator the comparator to order the results by
+	* @param dynamicQuery the dynamic query
+	* @param start the lower bound of the range of model instances
+	* @param end the upper bound of the range of model instances (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	* @throws SystemException if a system exception occurred
 	*/
@@ -135,9 +145,9 @@ public class PMMessageLocalServiceWrapper implements PMMessageLocalService {
 	}
 
 	/**
-	* Counts the number of rows that match the dynamic query.
+	* Returns the number of rows that match the dynamic query.
 	*
-	* @param dynamicQuery the dynamic query to search with
+	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
 	* @throws SystemException if a system exception occurred
 	*/
@@ -147,10 +157,15 @@ public class PMMessageLocalServiceWrapper implements PMMessageLocalService {
 		return _pmMessageLocalService.dynamicQueryCount(dynamicQuery);
 	}
 
+	public com.dharma.model.PMMessage fetchPMMessage(long messageId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _pmMessageLocalService.fetchPMMessage(messageId);
+	}
+
 	/**
-	* Gets the p m message with the primary key.
+	* Returns the p m message with the primary key.
 	*
-	* @param messageId the primary key of the p m message to get
+	* @param messageId the primary key of the p m message
 	* @return the p m message
 	* @throws PortalException if a p m message with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -161,15 +176,22 @@ public class PMMessageLocalServiceWrapper implements PMMessageLocalService {
 		return _pmMessageLocalService.getPMMessage(messageId);
 	}
 
+	public com.liferay.portal.model.PersistedModel getPersistedModel(
+		java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _pmMessageLocalService.getPersistedModel(primaryKeyObj);
+	}
+
 	/**
-	* Gets a range of all the p m messages.
+	* Returns a range of all the p m messages.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param start the lower bound of the range of p m messages to return
-	* @param end the upper bound of the range of p m messages to return (not inclusive)
+	* @param start the lower bound of the range of p m messages
+	* @param end the upper bound of the range of p m messages (not inclusive)
 	* @return the range of p m messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -179,7 +201,7 @@ public class PMMessageLocalServiceWrapper implements PMMessageLocalService {
 	}
 
 	/**
-	* Gets the number of p m messages.
+	* Returns the number of p m messages.
 	*
 	* @return the number of p m messages
 	* @throws SystemException if a system exception occurred
@@ -190,9 +212,9 @@ public class PMMessageLocalServiceWrapper implements PMMessageLocalService {
 	}
 
 	/**
-	* Updates the p m message in the database. Also notifies the appropriate model listeners.
+	* Updates the p m message in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
-	* @param pmMessage the p m message to update
+	* @param pmMessage the p m message
 	* @return the p m message that was updated
 	* @throws SystemException if a system exception occurred
 	*/
@@ -203,9 +225,9 @@ public class PMMessageLocalServiceWrapper implements PMMessageLocalService {
 	}
 
 	/**
-	* Updates the p m message in the database. Also notifies the appropriate model listeners.
+	* Updates the p m message in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
-	* @param pmMessage the p m message to update
+	* @param pmMessage the p m message
 	* @param merge whether to merge the p m message with the current session. See {@link com.liferay.portal.service.persistence.BatchSession#update(com.liferay.portal.kernel.dao.orm.Session, com.liferay.portal.model.BaseModel, boolean)} for an explanation.
 	* @return the p m message that was updated
 	* @throws SystemException if a system exception occurred
@@ -214,6 +236,31 @@ public class PMMessageLocalServiceWrapper implements PMMessageLocalService {
 		com.dharma.model.PMMessage pmMessage, boolean merge)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _pmMessageLocalService.updatePMMessage(pmMessage, merge);
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public java.lang.String getBeanIdentifier() {
+		return _pmMessageLocalService.getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public void setBeanIdentifier(java.lang.String beanIdentifier) {
+		_pmMessageLocalService.setBeanIdentifier(beanIdentifier);
+	}
+
+	public java.lang.Object invokeMethod(java.lang.String name,
+		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
+		throws java.lang.Throwable {
+		return _pmMessageLocalService.invokeMethod(name, parameterTypes,
+			arguments);
 	}
 
 	public int getUnreadCount(long userId)
@@ -232,8 +279,27 @@ public class PMMessageLocalServiceWrapper implements PMMessageLocalService {
 		return _pmMessageLocalService.getOutboxMessages(ownerId);
 	}
 
+	/**
+	 * @deprecated Renamed to {@link #getWrappedService}
+	 */
 	public PMMessageLocalService getWrappedPMMessageLocalService() {
 		return _pmMessageLocalService;
+	}
+
+	/**
+	 * @deprecated Renamed to {@link #setWrappedService}
+	 */
+	public void setWrappedPMMessageLocalService(
+		PMMessageLocalService pmMessageLocalService) {
+		_pmMessageLocalService = pmMessageLocalService;
+	}
+
+	public PMMessageLocalService getWrappedService() {
+		return _pmMessageLocalService;
+	}
+
+	public void setWrappedService(PMMessageLocalService pmMessageLocalService) {
+		_pmMessageLocalService = pmMessageLocalService;
 	}
 
 	private PMMessageLocalService _pmMessageLocalService;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,9 +14,13 @@
 
 package com.dharma.model;
 
+import com.dharma.service.PMMessageLocalServiceUtil;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
 
 import java.io.Serializable;
@@ -24,6 +28,8 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Brian Wing Shun Chan
@@ -32,16 +38,95 @@ public class PMMessageClp extends BaseModelImpl<PMMessage> implements PMMessage 
 	public PMMessageClp() {
 	}
 
+	public Class<?> getModelClass() {
+		return PMMessage.class;
+	}
+
+	public String getModelClassName() {
+		return PMMessage.class.getName();
+	}
+
 	public long getPrimaryKey() {
 		return _messageId;
 	}
 
-	public void setPrimaryKey(long pk) {
-		setMessageId(pk);
+	public void setPrimaryKey(long primaryKey) {
+		setMessageId(primaryKey);
 	}
 
 	public Serializable getPrimaryKeyObj() {
 		return new Long(_messageId);
+	}
+
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
+		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("messageId", getMessageId());
+		attributes.put("subject", getSubject());
+		attributes.put("body", getBody());
+		attributes.put("parentMessageId", getParentMessageId());
+		attributes.put("ownerId", getOwnerId());
+		attributes.put("ownerName", getOwnerName());
+		attributes.put("postedDate", getPostedDate());
+		attributes.put("recepients", getRecepients());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long messageId = (Long)attributes.get("messageId");
+
+		if (messageId != null) {
+			setMessageId(messageId);
+		}
+
+		String subject = (String)attributes.get("subject");
+
+		if (subject != null) {
+			setSubject(subject);
+		}
+
+		String body = (String)attributes.get("body");
+
+		if (body != null) {
+			setBody(body);
+		}
+
+		Long parentMessageId = (Long)attributes.get("parentMessageId");
+
+		if (parentMessageId != null) {
+			setParentMessageId(parentMessageId);
+		}
+
+		Long ownerId = (Long)attributes.get("ownerId");
+
+		if (ownerId != null) {
+			setOwnerId(ownerId);
+		}
+
+		String ownerName = (String)attributes.get("ownerName");
+
+		if (ownerName != null) {
+			setOwnerName(ownerName);
+		}
+
+		Date postedDate = (Date)attributes.get("postedDate");
+
+		if (postedDate != null) {
+			setPostedDate(postedDate);
+		}
+
+		String recepients = (String)attributes.get("recepients");
+
+		if (recepients != null) {
+			setRecepients(recepients);
+		}
 	}
 
 	public long getMessageId() {
@@ -108,16 +193,30 @@ public class PMMessageClp extends BaseModelImpl<PMMessage> implements PMMessage 
 		_recepients = recepients;
 	}
 
-	public PMMessage toEscapedModel() {
-		if (isEscapedModel()) {
-			return this;
+	public BaseModel<?> getPMMessageRemoteModel() {
+		return _pmMessageRemoteModel;
+	}
+
+	public void setPMMessageRemoteModel(BaseModel<?> pmMessageRemoteModel) {
+		_pmMessageRemoteModel = pmMessageRemoteModel;
+	}
+
+	public void persist() throws SystemException {
+		if (this.isNew()) {
+			PMMessageLocalServiceUtil.addPMMessage(this);
 		}
 		else {
-			return (PMMessage)Proxy.newProxyInstance(PMMessage.class.getClassLoader(),
-				new Class[] { PMMessage.class }, new AutoEscapeBeanHandler(this));
+			PMMessageLocalServiceUtil.updatePMMessage(this);
 		}
 	}
 
+	@Override
+	public PMMessage toEscapedModel() {
+		return (PMMessage)Proxy.newProxyInstance(PMMessage.class.getClassLoader(),
+			new Class[] { PMMessage.class }, new AutoEscapeBeanHandler(this));
+	}
+
+	@Override
 	public Object clone() {
 		PMMessageClp clone = new PMMessageClp();
 
@@ -147,6 +246,7 @@ public class PMMessageClp extends BaseModelImpl<PMMessage> implements PMMessage 
 		return 0;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
@@ -161,9 +261,9 @@ public class PMMessageClp extends BaseModelImpl<PMMessage> implements PMMessage 
 			return false;
 		}
 
-		long pk = pmMessage.getPrimaryKey();
+		long primaryKey = pmMessage.getPrimaryKey();
 
-		if (getPrimaryKey() == pk) {
+		if (getPrimaryKey() == primaryKey) {
 			return true;
 		}
 		else {
@@ -171,10 +271,12 @@ public class PMMessageClp extends BaseModelImpl<PMMessage> implements PMMessage 
 		}
 	}
 
+	@Override
 	public int hashCode() {
 		return (int)getPrimaryKey();
 	}
 
+	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(17);
 
@@ -252,4 +354,5 @@ public class PMMessageClp extends BaseModelImpl<PMMessage> implements PMMessage 
 	private String _ownerName;
 	private Date _postedDate;
 	private String _recepients;
+	private BaseModel<?> _pmMessageRemoteModel;
 }

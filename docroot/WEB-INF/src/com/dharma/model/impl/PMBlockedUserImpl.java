@@ -30,8 +30,7 @@ import com.dharma.model.PMBlockedUser;
  * @author Brian Wing Shun Chan
  *
  */
-public class PMBlockedUserImpl extends PMBlockedUserModelImpl
-	implements PMBlockedUser {
+public class PMBlockedUserImpl extends PMBlockedUserBaseImpl {
 	public PMBlockedUserImpl() {
 	}
 }

@@ -30,8 +30,7 @@ import com.dharma.model.PMReadMessage;
  * @author Brian Wing Shun Chan
  *
  */
-public class PMReadMessageImpl extends PMReadMessageModelImpl
-	implements PMReadMessage {
+public class PMReadMessageImpl extends PMReadMessageBaseImpl {
 	public PMReadMessageImpl() {
 	}
 }

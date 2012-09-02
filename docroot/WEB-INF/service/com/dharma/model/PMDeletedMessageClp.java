@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,9 +14,13 @@
 
 package com.dharma.model;
 
+import com.dharma.service.PMDeletedMessageLocalServiceUtil;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
 
 import java.io.Serializable;
@@ -24,6 +28,8 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Brian Wing Shun Chan
@@ -33,16 +39,67 @@ public class PMDeletedMessageClp extends BaseModelImpl<PMDeletedMessage>
 	public PMDeletedMessageClp() {
 	}
 
+	public Class<?> getModelClass() {
+		return PMDeletedMessage.class;
+	}
+
+	public String getModelClassName() {
+		return PMDeletedMessage.class.getName();
+	}
+
 	public long getPrimaryKey() {
 		return _deletedMessageId;
 	}
 
-	public void setPrimaryKey(long pk) {
-		setDeletedMessageId(pk);
+	public void setPrimaryKey(long primaryKey) {
+		setDeletedMessageId(primaryKey);
 	}
 
 	public Serializable getPrimaryKeyObj() {
 		return new Long(_deletedMessageId);
+	}
+
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
+		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("deletedMessageId", getDeletedMessageId());
+		attributes.put("messageId", getMessageId());
+		attributes.put("ownerId", getOwnerId());
+		attributes.put("deletedDate", getDeletedDate());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long deletedMessageId = (Long)attributes.get("deletedMessageId");
+
+		if (deletedMessageId != null) {
+			setDeletedMessageId(deletedMessageId);
+		}
+
+		Long messageId = (Long)attributes.get("messageId");
+
+		if (messageId != null) {
+			setMessageId(messageId);
+		}
+
+		Long ownerId = (Long)attributes.get("ownerId");
+
+		if (ownerId != null) {
+			setOwnerId(ownerId);
+		}
+
+		Date deletedDate = (Date)attributes.get("deletedDate");
+
+		if (deletedDate != null) {
+			setDeletedDate(deletedDate);
+		}
 	}
 
 	public long getDeletedMessageId() {
@@ -77,17 +134,32 @@ public class PMDeletedMessageClp extends BaseModelImpl<PMDeletedMessage>
 		_deletedDate = deletedDate;
 	}
 
-	public PMDeletedMessage toEscapedModel() {
-		if (isEscapedModel()) {
-			return this;
+	public BaseModel<?> getPMDeletedMessageRemoteModel() {
+		return _pmDeletedMessageRemoteModel;
+	}
+
+	public void setPMDeletedMessageRemoteModel(
+		BaseModel<?> pmDeletedMessageRemoteModel) {
+		_pmDeletedMessageRemoteModel = pmDeletedMessageRemoteModel;
+	}
+
+	public void persist() throws SystemException {
+		if (this.isNew()) {
+			PMDeletedMessageLocalServiceUtil.addPMDeletedMessage(this);
 		}
 		else {
-			return (PMDeletedMessage)Proxy.newProxyInstance(PMDeletedMessage.class.getClassLoader(),
-				new Class[] { PMDeletedMessage.class },
-				new AutoEscapeBeanHandler(this));
+			PMDeletedMessageLocalServiceUtil.updatePMDeletedMessage(this);
 		}
 	}
 
+	@Override
+	public PMDeletedMessage toEscapedModel() {
+		return (PMDeletedMessage)Proxy.newProxyInstance(PMDeletedMessage.class.getClassLoader(),
+			new Class[] { PMDeletedMessage.class },
+			new AutoEscapeBeanHandler(this));
+	}
+
+	@Override
 	public Object clone() {
 		PMDeletedMessageClp clone = new PMDeletedMessageClp();
 
@@ -114,6 +186,7 @@ public class PMDeletedMessageClp extends BaseModelImpl<PMDeletedMessage>
 		return 0;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
@@ -128,9 +201,9 @@ public class PMDeletedMessageClp extends BaseModelImpl<PMDeletedMessage>
 			return false;
 		}
 
-		long pk = pmDeletedMessage.getPrimaryKey();
+		long primaryKey = pmDeletedMessage.getPrimaryKey();
 
-		if (getPrimaryKey() == pk) {
+		if (getPrimaryKey() == primaryKey) {
 			return true;
 		}
 		else {
@@ -138,10 +211,12 @@ public class PMDeletedMessageClp extends BaseModelImpl<PMDeletedMessage>
 		}
 	}
 
+	@Override
 	public int hashCode() {
 		return (int)getPrimaryKey();
 	}
 
+	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(9);
 
@@ -191,4 +266,5 @@ public class PMDeletedMessageClp extends BaseModelImpl<PMDeletedMessage>
 	private long _messageId;
 	private long _ownerId;
 	private Date _deletedDate;
+	private BaseModel<?> _pmDeletedMessageRemoteModel;
 }

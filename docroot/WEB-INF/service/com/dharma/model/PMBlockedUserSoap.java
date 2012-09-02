@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -21,20 +21,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * <a href="PMBlockedUserSoap.java.html"><b><i>View Source</i></b></a>
- *
- * <p>
- * ServiceBuilder generated this class. Modifications in this class will be
- * overwritten the next time is generated.
- * </p>
- *
- * <p>
- * This class is used by
- * {@link com.dharma.service.http.PMBlockedUserServiceSoap}.
- * </p>
+ * This class is used by SOAP remote services.
  *
  * @author    Brian Wing Shun Chan
- * @see       com.dharma.service.http.PMBlockedUserServiceSoap
  * @generated
  */
 public class PMBlockedUserSoap implements Serializable {

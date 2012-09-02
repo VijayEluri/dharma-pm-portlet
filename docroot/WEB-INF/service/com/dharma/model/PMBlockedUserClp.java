@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -14,10 +14,13 @@
 
 package com.dharma.model;
 
+import com.dharma.service.PMBlockedUserLocalServiceUtil;
+
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.model.BaseModel;
 import com.liferay.portal.model.impl.BaseModelImpl;
 import com.liferay.portal.util.PortalUtil;
 
@@ -26,6 +29,8 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Brian Wing Shun Chan
@@ -35,16 +40,67 @@ public class PMBlockedUserClp extends BaseModelImpl<PMBlockedUser>
 	public PMBlockedUserClp() {
 	}
 
+	public Class<?> getModelClass() {
+		return PMBlockedUser.class;
+	}
+
+	public String getModelClassName() {
+		return PMBlockedUser.class.getName();
+	}
+
 	public long getPrimaryKey() {
 		return _blockedUserId;
 	}
 
-	public void setPrimaryKey(long pk) {
-		setBlockedUserId(pk);
+	public void setPrimaryKey(long primaryKey) {
+		setBlockedUserId(primaryKey);
 	}
 
 	public Serializable getPrimaryKeyObj() {
 		return new Long(_blockedUserId);
+	}
+
+	public void setPrimaryKeyObj(Serializable primaryKeyObj) {
+		setPrimaryKey(((Long)primaryKeyObj).longValue());
+	}
+
+	@Override
+	public Map<String, Object> getModelAttributes() {
+		Map<String, Object> attributes = new HashMap<String, Object>();
+
+		attributes.put("blockedUserId", getBlockedUserId());
+		attributes.put("ownerId", getOwnerId());
+		attributes.put("userId", getUserId());
+		attributes.put("blockedDate", getBlockedDate());
+
+		return attributes;
+	}
+
+	@Override
+	public void setModelAttributes(Map<String, Object> attributes) {
+		Long blockedUserId = (Long)attributes.get("blockedUserId");
+
+		if (blockedUserId != null) {
+			setBlockedUserId(blockedUserId);
+		}
+
+		Long ownerId = (Long)attributes.get("ownerId");
+
+		if (ownerId != null) {
+			setOwnerId(ownerId);
+		}
+
+		Long userId = (Long)attributes.get("userId");
+
+		if (userId != null) {
+			setUserId(userId);
+		}
+
+		Date blockedDate = (Date)attributes.get("blockedDate");
+
+		if (blockedDate != null) {
+			setBlockedDate(blockedDate);
+		}
 	}
 
 	public long getBlockedUserId() {
@@ -96,17 +152,31 @@ public class PMBlockedUserClp extends BaseModelImpl<PMBlockedUser>
 		_blockedDate = blockedDate;
 	}
 
-	public PMBlockedUser toEscapedModel() {
-		if (isEscapedModel()) {
-			return this;
+	public BaseModel<?> getPMBlockedUserRemoteModel() {
+		return _pmBlockedUserRemoteModel;
+	}
+
+	public void setPMBlockedUserRemoteModel(
+		BaseModel<?> pmBlockedUserRemoteModel) {
+		_pmBlockedUserRemoteModel = pmBlockedUserRemoteModel;
+	}
+
+	public void persist() throws SystemException {
+		if (this.isNew()) {
+			PMBlockedUserLocalServiceUtil.addPMBlockedUser(this);
 		}
 		else {
-			return (PMBlockedUser)Proxy.newProxyInstance(PMBlockedUser.class.getClassLoader(),
-				new Class[] { PMBlockedUser.class },
-				new AutoEscapeBeanHandler(this));
+			PMBlockedUserLocalServiceUtil.updatePMBlockedUser(this);
 		}
 	}
 
+	@Override
+	public PMBlockedUser toEscapedModel() {
+		return (PMBlockedUser)Proxy.newProxyInstance(PMBlockedUser.class.getClassLoader(),
+			new Class[] { PMBlockedUser.class }, new AutoEscapeBeanHandler(this));
+	}
+
+	@Override
 	public Object clone() {
 		PMBlockedUserClp clone = new PMBlockedUserClp();
 
@@ -133,6 +203,7 @@ public class PMBlockedUserClp extends BaseModelImpl<PMBlockedUser>
 		return 0;
 	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
@@ -147,9 +218,9 @@ public class PMBlockedUserClp extends BaseModelImpl<PMBlockedUser>
 			return false;
 		}
 
-		long pk = pmBlockedUser.getPrimaryKey();
+		long primaryKey = pmBlockedUser.getPrimaryKey();
 
-		if (getPrimaryKey() == pk) {
+		if (getPrimaryKey() == primaryKey) {
 			return true;
 		}
 		else {
@@ -157,10 +228,12 @@ public class PMBlockedUserClp extends BaseModelImpl<PMBlockedUser>
 		}
 	}
 
+	@Override
 	public int hashCode() {
 		return (int)getPrimaryKey();
 	}
 
+	@Override
 	public String toString() {
 		StringBundler sb = new StringBundler(9);
 
@@ -212,4 +285,5 @@ public class PMBlockedUserClp extends BaseModelImpl<PMBlockedUser>
 	private long _userId;
 	private String _userUuid;
 	private Date _blockedDate;
+	private BaseModel<?> _pmBlockedUserRemoteModel;
 }

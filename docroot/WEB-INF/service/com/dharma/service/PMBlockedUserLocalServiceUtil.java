@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -15,14 +15,11 @@
 package com.dharma.service;
 
 import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
-import com.liferay.portal.kernel.util.ClassLoaderProxy;
+import com.liferay.portal.kernel.util.ReferenceRegistry;
+import com.liferay.portal.service.InvokableLocalService;
 
 /**
  * The utility for the p m blocked user local service. This utility wraps {@link com.dharma.service.impl.PMBlockedUserLocalServiceImpl} and is the primary access point for service operations in application layer code running on the local server.
- *
- * <p>
- * Never modify this class directly. Add custom service methods to {@link com.dharma.service.impl.PMBlockedUserLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
- * </p>
  *
  * <p>
  * This is a local service. Methods of this service will not have security checks based on the propagated JAAS credentials because this service can only be accessed from within the same VM.
@@ -35,10 +32,16 @@ import com.liferay.portal.kernel.util.ClassLoaderProxy;
  * @generated
  */
 public class PMBlockedUserLocalServiceUtil {
+	/*
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify this class directly. Add custom service methods to {@link com.dharma.service.impl.PMBlockedUserLocalServiceImpl} and rerun ServiceBuilder to regenerate this class.
+	 */
+
 	/**
 	* Adds the p m blocked user to the database. Also notifies the appropriate model listeners.
 	*
-	* @param pmBlockedUser the p m blocked user to add
+	* @param pmBlockedUser the p m blocked user
 	* @return the p m blocked user that was added
 	* @throws SystemException if a system exception occurred
 	*/
@@ -62,32 +65,39 @@ public class PMBlockedUserLocalServiceUtil {
 	/**
 	* Deletes the p m blocked user with the primary key from the database. Also notifies the appropriate model listeners.
 	*
-	* @param blockedUserId the primary key of the p m blocked user to delete
+	* @param blockedUserId the primary key of the p m blocked user
+	* @return the p m blocked user that was removed
 	* @throws PortalException if a p m blocked user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deletePMBlockedUser(long blockedUserId)
+	public static com.dharma.model.PMBlockedUser deletePMBlockedUser(
+		long blockedUserId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		getService().deletePMBlockedUser(blockedUserId);
+		return getService().deletePMBlockedUser(blockedUserId);
 	}
 
 	/**
 	* Deletes the p m blocked user from the database. Also notifies the appropriate model listeners.
 	*
-	* @param pmBlockedUser the p m blocked user to delete
+	* @param pmBlockedUser the p m blocked user
+	* @return the p m blocked user that was removed
 	* @throws SystemException if a system exception occurred
 	*/
-	public static void deletePMBlockedUser(
+	public static com.dharma.model.PMBlockedUser deletePMBlockedUser(
 		com.dharma.model.PMBlockedUser pmBlockedUser)
 		throws com.liferay.portal.kernel.exception.SystemException {
-		getService().deletePMBlockedUser(pmBlockedUser);
+		return getService().deletePMBlockedUser(pmBlockedUser);
+	}
+
+	public static com.liferay.portal.kernel.dao.orm.DynamicQuery dynamicQuery() {
+		return getService().dynamicQuery();
 	}
 
 	/**
 	* Performs a dynamic query on the database and returns the matching rows.
 	*
-	* @param dynamicQuery the dynamic query to search with
+	* @param dynamicQuery the dynamic query
 	* @return the matching rows
 	* @throws SystemException if a system exception occurred
 	*/
@@ -105,9 +115,9 @@ public class PMBlockedUserLocalServiceUtil {
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param dynamicQuery the dynamic query to search with
-	* @param start the lower bound of the range of model instances to return
-	* @param end the upper bound of the range of model instances to return (not inclusive)
+	* @param dynamicQuery the dynamic query
+	* @param start the lower bound of the range of model instances
+	* @param end the upper bound of the range of model instances (not inclusive)
 	* @return the range of matching rows
 	* @throws SystemException if a system exception occurred
 	*/
@@ -125,10 +135,10 @@ public class PMBlockedUserLocalServiceUtil {
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param dynamicQuery the dynamic query to search with
-	* @param start the lower bound of the range of model instances to return
-	* @param end the upper bound of the range of model instances to return (not inclusive)
-	* @param orderByComparator the comparator to order the results by
+	* @param dynamicQuery the dynamic query
+	* @param start the lower bound of the range of model instances
+	* @param end the upper bound of the range of model instances (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching rows
 	* @throws SystemException if a system exception occurred
 	*/
@@ -143,9 +153,9 @@ public class PMBlockedUserLocalServiceUtil {
 	}
 
 	/**
-	* Counts the number of rows that match the dynamic query.
+	* Returns the number of rows that match the dynamic query.
 	*
-	* @param dynamicQuery the dynamic query to search with
+	* @param dynamicQuery the dynamic query
 	* @return the number of rows that match the dynamic query
 	* @throws SystemException if a system exception occurred
 	*/
@@ -155,10 +165,16 @@ public class PMBlockedUserLocalServiceUtil {
 		return getService().dynamicQueryCount(dynamicQuery);
 	}
 
+	public static com.dharma.model.PMBlockedUser fetchPMBlockedUser(
+		long blockedUserId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService().fetchPMBlockedUser(blockedUserId);
+	}
+
 	/**
-	* Gets the p m blocked user with the primary key.
+	* Returns the p m blocked user with the primary key.
 	*
-	* @param blockedUserId the primary key of the p m blocked user to get
+	* @param blockedUserId the primary key of the p m blocked user
 	* @return the p m blocked user
 	* @throws PortalException if a p m blocked user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -170,15 +186,22 @@ public class PMBlockedUserLocalServiceUtil {
 		return getService().getPMBlockedUser(blockedUserId);
 	}
 
+	public static com.liferay.portal.model.PersistedModel getPersistedModel(
+		java.io.Serializable primaryKeyObj)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getPersistedModel(primaryKeyObj);
+	}
+
 	/**
-	* Gets a range of all the p m blocked users.
+	* Returns a range of all the p m blocked users.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param start the lower bound of the range of p m blocked users to return
-	* @param end the upper bound of the range of p m blocked users to return (not inclusive)
+	* @param start the lower bound of the range of p m blocked users
+	* @param end the upper bound of the range of p m blocked users (not inclusive)
 	* @return the range of p m blocked users
 	* @throws SystemException if a system exception occurred
 	*/
@@ -189,7 +212,7 @@ public class PMBlockedUserLocalServiceUtil {
 	}
 
 	/**
-	* Gets the number of p m blocked users.
+	* Returns the number of p m blocked users.
 	*
 	* @return the number of p m blocked users
 	* @throws SystemException if a system exception occurred
@@ -200,9 +223,9 @@ public class PMBlockedUserLocalServiceUtil {
 	}
 
 	/**
-	* Updates the p m blocked user in the database. Also notifies the appropriate model listeners.
+	* Updates the p m blocked user in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
-	* @param pmBlockedUser the p m blocked user to update
+	* @param pmBlockedUser the p m blocked user
 	* @return the p m blocked user that was updated
 	* @throws SystemException if a system exception occurred
 	*/
@@ -213,9 +236,9 @@ public class PMBlockedUserLocalServiceUtil {
 	}
 
 	/**
-	* Updates the p m blocked user in the database. Also notifies the appropriate model listeners.
+	* Updates the p m blocked user in the database or adds it if it does not yet exist. Also notifies the appropriate model listeners.
 	*
-	* @param pmBlockedUser the p m blocked user to update
+	* @param pmBlockedUser the p m blocked user
 	* @param merge whether to merge the p m blocked user with the current session. See {@link com.liferay.portal.service.persistence.BatchSession#update(com.liferay.portal.kernel.dao.orm.Session, com.liferay.portal.model.BaseModel, boolean)} for an explanation.
 	* @return the p m blocked user that was updated
 	* @throws SystemException if a system exception occurred
@@ -224,6 +247,30 @@ public class PMBlockedUserLocalServiceUtil {
 		com.dharma.model.PMBlockedUser pmBlockedUser, boolean merge)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().updatePMBlockedUser(pmBlockedUser, merge);
+	}
+
+	/**
+	* Returns the Spring bean ID for this bean.
+	*
+	* @return the Spring bean ID for this bean
+	*/
+	public static java.lang.String getBeanIdentifier() {
+		return getService().getBeanIdentifier();
+	}
+
+	/**
+	* Sets the Spring bean ID for this bean.
+	*
+	* @param beanIdentifier the Spring bean ID for this bean
+	*/
+	public static void setBeanIdentifier(java.lang.String beanIdentifier) {
+		getService().setBeanIdentifier(beanIdentifier);
+	}
+
+	public static java.lang.Object invokeMethod(java.lang.String name,
+		java.lang.String[] parameterTypes, java.lang.Object[] arguments)
+		throws java.lang.Throwable {
+		return getService().invokeMethod(name, parameterTypes, arguments);
 	}
 
 	public static boolean isUserBlocked(long ownerId, long userId)
@@ -243,24 +290,27 @@ public class PMBlockedUserLocalServiceUtil {
 
 	public static PMBlockedUserLocalService getService() {
 		if (_service == null) {
-			Object obj = PortletBeanLocatorUtil.locate(ClpSerializer.SERVLET_CONTEXT_NAME,
+			InvokableLocalService invokableLocalService = (InvokableLocalService)PortletBeanLocatorUtil.locate(ClpSerializer.getServletContextName(),
 					PMBlockedUserLocalService.class.getName());
-			ClassLoader portletClassLoader = (ClassLoader)PortletBeanLocatorUtil.locate(ClpSerializer.SERVLET_CONTEXT_NAME,
-					"portletClassLoader");
 
-			ClassLoaderProxy classLoaderProxy = new ClassLoaderProxy(obj,
-					portletClassLoader);
+			if (invokableLocalService instanceof PMBlockedUserLocalService) {
+				_service = (PMBlockedUserLocalService)invokableLocalService;
+			}
+			else {
+				_service = new PMBlockedUserLocalServiceClp(invokableLocalService);
+			}
 
-			_service = new PMBlockedUserLocalServiceClp(classLoaderProxy);
-
-			ClpSerializer.setClassLoader(portletClassLoader);
+			ReferenceRegistry.registerReference(PMBlockedUserLocalServiceUtil.class,
+				"_service");
 		}
 
 		return _service;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setService(PMBlockedUserLocalService service) {
-		_service = service;
 	}
 
 	private static PMBlockedUserLocalService _service;

@@ -143,7 +143,7 @@ public class PMUtil {
 				if (c.isCommunity() 
 						&& !c.getName().equals("Control Panel") 
 						&& !c.getName().equals("Guest")) {
-					if (c.getType() != GroupConstants.TYPE_COMMUNITY_OPEN) {
+					if (c.getType() != GroupConstants.TYPE_SITE_OPEN) {
 						boolean isMember = false;
 						for (Group cm : GroupLocalServiceUtil.getUserGroups(userId)) {
 							if (cm.getGroupId() == c.getGroupId()) {

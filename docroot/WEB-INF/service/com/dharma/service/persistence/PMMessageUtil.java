@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2000-2010 Liferay, Inc. All rights reserved.
+ * Copyright (c) 2000-2012 Liferay, Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License as published by the Free
@@ -20,16 +20,13 @@ import com.liferay.portal.kernel.bean.PortletBeanLocatorUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.OrderByComparator;
+import com.liferay.portal.kernel.util.ReferenceRegistry;
 import com.liferay.portal.service.ServiceContext;
 
 import java.util.List;
 
 /**
  * The persistence utility for the p m message service. This utility wraps {@link PMMessagePersistenceImpl} and provides direct access to the database for CRUD operations. This utility should only be used by the service layer, as it must operate within a transaction. Never access this utility in a JSP, controller, model, or other front-end class.
- *
- * <p>
- * Never modify this class directly. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
- * </p>
  *
  * <p>
  * Caching information and settings can be found in <code>portal.properties</code>
@@ -41,6 +38,12 @@ import java.util.List;
  * @generated
  */
 public class PMMessageUtil {
+	/*
+	 * NOTE FOR DEVELOPERS:
+	 *
+	 * Never modify this class directly. Modify <code>service.xml</code> and rerun ServiceBuilder to regenerate this class.
+	 */
+
 	/**
 	 * @see com.liferay.portal.service.persistence.BasePersistence#clearCache()
 	 */
@@ -92,14 +95,6 @@ public class PMMessageUtil {
 	}
 
 	/**
-	 * @see com.liferay.portal.service.persistence.BasePersistence#remove(com.liferay.portal.model.BaseModel)
-	 */
-	public static PMMessage remove(PMMessage pmMessage)
-		throws SystemException {
-		return getPersistence().remove(pmMessage);
-	}
-
-	/**
 	 * @see com.liferay.portal.service.persistence.BasePersistence#update(com.liferay.portal.model.BaseModel, boolean)
 	 */
 	public static PMMessage update(PMMessage pmMessage, boolean merge)
@@ -118,7 +113,7 @@ public class PMMessageUtil {
 	/**
 	* Caches the p m message in the entity cache if it is enabled.
 	*
-	* @param pmMessage the p m message to cache
+	* @param pmMessage the p m message
 	*/
 	public static void cacheResult(com.dharma.model.PMMessage pmMessage) {
 		getPersistence().cacheResult(pmMessage);
@@ -127,7 +122,7 @@ public class PMMessageUtil {
 	/**
 	* Caches the p m messages in the entity cache if it is enabled.
 	*
-	* @param pmMessages the p m messages to cache
+	* @param pmMessages the p m messages
 	*/
 	public static void cacheResult(
 		java.util.List<com.dharma.model.PMMessage> pmMessages) {
@@ -147,7 +142,7 @@ public class PMMessageUtil {
 	/**
 	* Removes the p m message with the primary key from the database. Also notifies the appropriate model listeners.
 	*
-	* @param messageId the primary key of the p m message to remove
+	* @param messageId the primary key of the p m message
 	* @return the p m message that was removed
 	* @throws com.dharma.NoSuchPMMessageException if a p m message with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -165,9 +160,9 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds the p m message with the primary key or throws a {@link com.dharma.NoSuchPMMessageException} if it could not be found.
+	* Returns the p m message with the primary key or throws a {@link com.dharma.NoSuchPMMessageException} if it could not be found.
 	*
-	* @param messageId the primary key of the p m message to find
+	* @param messageId the primary key of the p m message
 	* @return the p m message
 	* @throws com.dharma.NoSuchPMMessageException if a p m message with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -179,9 +174,9 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds the p m message with the primary key or returns <code>null</code> if it could not be found.
+	* Returns the p m message with the primary key or returns <code>null</code> if it could not be found.
 	*
-	* @param messageId the primary key of the p m message to find
+	* @param messageId the primary key of the p m message
 	* @return the p m message, or <code>null</code> if a p m message with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
@@ -191,9 +186,9 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds all the p m messages where ownerId = &#63;.
+	* Returns all the p m messages where ownerId = &#63;.
 	*
-	* @param ownerId the owner id to search with
+	* @param ownerId the owner ID
 	* @return the matching p m messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -204,15 +199,15 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds a range of all the p m messages where ownerId = &#63;.
+	* Returns a range of all the p m messages where ownerId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param ownerId the owner id to search with
-	* @param start the lower bound of the range of p m messages to return
-	* @param end the upper bound of the range of p m messages to return (not inclusive)
+	* @param ownerId the owner ID
+	* @param start the lower bound of the range of p m messages
+	* @param end the upper bound of the range of p m messages (not inclusive)
 	* @return the range of matching p m messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -223,16 +218,16 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds an ordered range of all the p m messages where ownerId = &#63;.
+	* Returns an ordered range of all the p m messages where ownerId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param ownerId the owner id to search with
-	* @param start the lower bound of the range of p m messages to return
-	* @param end the upper bound of the range of p m messages to return (not inclusive)
-	* @param orderByComparator the comparator to order the results by
+	* @param ownerId the owner ID
+	* @param start the lower bound of the range of p m messages
+	* @param end the upper bound of the range of p m messages (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching p m messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -245,14 +240,10 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds the first p m message in the ordered set where ownerId = &#63;.
+	* Returns the first p m message in the ordered set where ownerId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
-	*
-	* @param ownerId the owner id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching p m message
 	* @throws com.dharma.NoSuchPMMessageException if a matching p m message could not be found
 	* @throws SystemException if a system exception occurred
@@ -265,14 +256,25 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds the last p m message in the ordered set where ownerId = &#63;.
+	* Returns the first p m message in the ordered set where ownerId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching p m message, or <code>null</code> if a matching p m message could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.dharma.model.PMMessage fetchByOwnerId_First(
+		long ownerId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().fetchByOwnerId_First(ownerId, orderByComparator);
+	}
+
+	/**
+	* Returns the last p m message in the ordered set where ownerId = &#63;.
 	*
-	* @param ownerId the owner id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching p m message
 	* @throws com.dharma.NoSuchPMMessageException if a matching p m message could not be found
 	* @throws SystemException if a system exception occurred
@@ -285,15 +287,25 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds the p m messages before and after the current p m message in the ordered set where ownerId = &#63;.
+	* Returns the last p m message in the ordered set where ownerId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching p m message, or <code>null</code> if a matching p m message could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.dharma.model.PMMessage fetchByOwnerId_Last(long ownerId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence().fetchByOwnerId_Last(ownerId, orderByComparator);
+	}
+
+	/**
+	* Returns the p m messages before and after the current p m message in the ordered set where ownerId = &#63;.
 	*
 	* @param messageId the primary key of the current p m message
-	* @param ownerId the owner id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param ownerId the owner ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next p m message
 	* @throws com.dharma.NoSuchPMMessageException if a p m message with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -309,9 +321,9 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds all the p m messages where parentMessageId = &#63;.
+	* Returns all the p m messages where parentMessageId = &#63;.
 	*
-	* @param parentMessageId the parent message id to search with
+	* @param parentMessageId the parent message ID
 	* @return the matching p m messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -322,15 +334,15 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds a range of all the p m messages where parentMessageId = &#63;.
+	* Returns a range of all the p m messages where parentMessageId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param parentMessageId the parent message id to search with
-	* @param start the lower bound of the range of p m messages to return
-	* @param end the upper bound of the range of p m messages to return (not inclusive)
+	* @param parentMessageId the parent message ID
+	* @param start the lower bound of the range of p m messages
+	* @param end the upper bound of the range of p m messages (not inclusive)
 	* @return the range of matching p m messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -342,16 +354,16 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds an ordered range of all the p m messages where parentMessageId = &#63;.
+	* Returns an ordered range of all the p m messages where parentMessageId = &#63;.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param parentMessageId the parent message id to search with
-	* @param start the lower bound of the range of p m messages to return
-	* @param end the upper bound of the range of p m messages to return (not inclusive)
-	* @param orderByComparator the comparator to order the results by
+	* @param parentMessageId the parent message ID
+	* @param start the lower bound of the range of p m messages
+	* @param end the upper bound of the range of p m messages (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of matching p m messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -365,14 +377,10 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds the first p m message in the ordered set where parentMessageId = &#63;.
+	* Returns the first p m message in the ordered set where parentMessageId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
-	*
-	* @param parentMessageId the parent message id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param parentMessageId the parent message ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the first matching p m message
 	* @throws com.dharma.NoSuchPMMessageException if a matching p m message could not be found
 	* @throws SystemException if a system exception occurred
@@ -388,14 +396,27 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds the last p m message in the ordered set where parentMessageId = &#63;.
+	* Returns the first p m message in the ordered set where parentMessageId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
+	* @param parentMessageId the parent message ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the first matching p m message, or <code>null</code> if a matching p m message could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.dharma.model.PMMessage fetchByParentMessageId_First(
+		long parentMessageId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByParentMessageId_First(parentMessageId,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the last p m message in the ordered set where parentMessageId = &#63;.
 	*
-	* @param parentMessageId the parent message id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param parentMessageId the parent message ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the last matching p m message
 	* @throws com.dharma.NoSuchPMMessageException if a matching p m message could not be found
 	* @throws SystemException if a system exception occurred
@@ -411,15 +432,28 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds the p m messages before and after the current p m message in the ordered set where parentMessageId = &#63;.
+	* Returns the last p m message in the ordered set where parentMessageId = &#63;.
 	*
-	* <p>
-	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
-	* </p>
+	* @param parentMessageId the parent message ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
+	* @return the last matching p m message, or <code>null</code> if a matching p m message could not be found
+	* @throws SystemException if a system exception occurred
+	*/
+	public static com.dharma.model.PMMessage fetchByParentMessageId_Last(
+		long parentMessageId,
+		com.liferay.portal.kernel.util.OrderByComparator orderByComparator)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getPersistence()
+				   .fetchByParentMessageId_Last(parentMessageId,
+			orderByComparator);
+	}
+
+	/**
+	* Returns the p m messages before and after the current p m message in the ordered set where parentMessageId = &#63;.
 	*
 	* @param messageId the primary key of the current p m message
-	* @param parentMessageId the parent message id to search with
-	* @param orderByComparator the comparator to order the set by
+	* @param parentMessageId the parent message ID
+	* @param orderByComparator the comparator to order the set by (optionally <code>null</code>)
 	* @return the previous, current, and next p m message
 	* @throws com.dharma.NoSuchPMMessageException if a p m message with the primary key could not be found
 	* @throws SystemException if a system exception occurred
@@ -435,7 +469,7 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds all the p m messages.
+	* Returns all the p m messages.
 	*
 	* @return the p m messages
 	* @throws SystemException if a system exception occurred
@@ -446,14 +480,14 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds a range of all the p m messages.
+	* Returns a range of all the p m messages.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param start the lower bound of the range of p m messages to return
-	* @param end the upper bound of the range of p m messages to return (not inclusive)
+	* @param start the lower bound of the range of p m messages
+	* @param end the upper bound of the range of p m messages (not inclusive)
 	* @return the range of p m messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -464,15 +498,15 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Finds an ordered range of all the p m messages.
+	* Returns an ordered range of all the p m messages.
 	*
 	* <p>
 	* Useful when paginating results. Returns a maximum of <code>end - start</code> instances. <code>start</code> and <code>end</code> are not primary keys, they are indexes in the result set. Thus, <code>0</code> refers to the first result in the set. Setting both <code>start</code> and <code>end</code> to {@link com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full result set.
 	* </p>
 	*
-	* @param start the lower bound of the range of p m messages to return
-	* @param end the upper bound of the range of p m messages to return (not inclusive)
-	* @param orderByComparator the comparator to order the results by
+	* @param start the lower bound of the range of p m messages
+	* @param end the upper bound of the range of p m messages (not inclusive)
+	* @param orderByComparator the comparator to order the results by (optionally <code>null</code>)
 	* @return the ordered range of p m messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -486,7 +520,7 @@ public class PMMessageUtil {
 	/**
 	* Removes all the p m messages where ownerId = &#63; from the database.
 	*
-	* @param ownerId the owner id to search with
+	* @param ownerId the owner ID
 	* @throws SystemException if a system exception occurred
 	*/
 	public static void removeByOwnerId(long ownerId)
@@ -497,7 +531,7 @@ public class PMMessageUtil {
 	/**
 	* Removes all the p m messages where parentMessageId = &#63; from the database.
 	*
-	* @param parentMessageId the parent message id to search with
+	* @param parentMessageId the parent message ID
 	* @throws SystemException if a system exception occurred
 	*/
 	public static void removeByParentMessageId(long parentMessageId)
@@ -516,9 +550,9 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Counts all the p m messages where ownerId = &#63;.
+	* Returns the number of p m messages where ownerId = &#63;.
 	*
-	* @param ownerId the owner id to search with
+	* @param ownerId the owner ID
 	* @return the number of matching p m messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -528,9 +562,9 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Counts all the p m messages where parentMessageId = &#63;.
+	* Returns the number of p m messages where parentMessageId = &#63;.
 	*
-	* @param parentMessageId the parent message id to search with
+	* @param parentMessageId the parent message ID
 	* @return the number of matching p m messages
 	* @throws SystemException if a system exception occurred
 	*/
@@ -540,7 +574,7 @@ public class PMMessageUtil {
 	}
 
 	/**
-	* Counts all the p m messages.
+	* Returns the number of p m messages.
 	*
 	* @return the number of p m messages
 	* @throws SystemException if a system exception occurred
@@ -552,15 +586,20 @@ public class PMMessageUtil {
 
 	public static PMMessagePersistence getPersistence() {
 		if (_persistence == null) {
-			_persistence = (PMMessagePersistence)PortletBeanLocatorUtil.locate(com.dharma.service.ClpSerializer.SERVLET_CONTEXT_NAME,
+			_persistence = (PMMessagePersistence)PortletBeanLocatorUtil.locate(com.dharma.service.ClpSerializer.getServletContextName(),
 					PMMessagePersistence.class.getName());
+
+			ReferenceRegistry.registerReference(PMMessageUtil.class,
+				"_persistence");
 		}
 
 		return _persistence;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public void setPersistence(PMMessagePersistence persistence) {
-		_persistence = persistence;
 	}
 
 	private static PMMessagePersistence _persistence;
